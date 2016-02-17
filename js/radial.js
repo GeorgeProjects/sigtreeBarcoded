@@ -43,15 +43,6 @@ var radial = function(){
 		.attr("id","slider-g")
 		.attr("transform","translate(" + sliderDivWidth * 4 / 10 + "," + 0 + ")");
 
-	sliderSvg.select("#slider-g")
-		.append("rect")
-		.attr("id","back-slider")
-		.attr("height",sliderHeight)
-		.attr("width",sliderWidth)
-		.attr("x",0)
-		.attr("y",0)
-		.attr("fill","gray");
-
 	var dragDis = 0;
 	var drag = d3.behavior.drag()
         .on("drag", function(d,i) {
@@ -81,6 +72,16 @@ var radial = function(){
         	changePercentage(finalValue);
         });
 
+    sliderSvg.select("#back-slider").remove();
+    sliderSvg.select("#slider-g")
+		.append("rect")
+		.attr("id","back-slider")
+		.attr("height",sliderHeight)
+		.attr("width",sliderWidth)
+		.attr("x",0)
+		.attr("y",0)
+		.attr("fill","gray");
+	sliderSvg.selectAll(".slider").remove();
 	sliderSvg.select("#slider-g")
 		.selectAll(".slider")
 		.data(widthArray)
@@ -90,10 +91,6 @@ var radial = function(){
 		.attr("id",function(d,i){
 			return "slider-" + i;
 		})
-		//.attr("transform", function(d,i){
-		//	var value = +d;
-		//	return "translate(" + -sliderWidth/4 + "," + value / max * sliderHeight + ")";
-		//})
 		.attr("x",-sliderWidth/4)
 		.attr("y",function(d,i){
 			var value = +d;
@@ -111,16 +108,6 @@ var radial = function(){
 			clearPercentage();
 		})
 		.call(drag);
-	/*sliderSvg.append("text")
-		.attr("id","text-0")
-		.attr("x",0)
-		.attr("y",0)
-		.attr("width",3)
-		.attr("height",3)
-		.text("0")
-		.attr("font-family","sans-serif")
-		.attr("font-size","20px")
-		.attr("fill","red");*/
 	//注意：JS中函数参数传递不是按引用传的
 	//函数内部如果直接给传入的对象赋值，效果是对内部的拷贝赋值；如果修改传入的对象的成员，那么修改能够影响到传入的对象
 
@@ -894,10 +881,8 @@ var radial = function(){
 							.attr("position","absolute")
 					.attr("transform",function(d,i){  
 					        return "translate(" + (text_x) + "," + (text_y) + ")";  
-					    }) 
-						;
-							
-			var strs = str.split("，") ;
+					    });	
+			var strs = str.split("，");
 			
 			console.log(strs);
 								
@@ -909,14 +894,9 @@ var radial = function(){
 					.attr("dy","1em")
 					.text(function(d){
 						return d;
-					})
-					;
+					});
 		}
 	}
-
-	
-		
-
 	function creat_button(rect_attribute_button){
 		var width = rect_attribute_button.width;  //画布的宽度
 		var height = rect_attribute_button.height;   //画布的高度
@@ -934,53 +914,39 @@ var radial = function(){
 		var cur_data=rect_attribute_button.cur_data;
  
  		var tooltip=d3.selectAll("#tooltip");
-
-		
-
 		g.append("rect")
-
-					.datum(cur_data)//绑定数据以后，后面的function才能接到d，否则只能接到this
-					
-					.on("mouseover",mouseover_function)
-					.on("click",mouseclick_function)
-
-					.on("mouseout",function(){
-						mouseout_function(this);
-						tooltip.style("opacity",0.0);
-					})
-					.on("mousemove",function(){
-						// 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 
-						tooltip.style("left", (d3.event.pageX) + "px")
-							.style("top", (d3.event.pageY + 20) + "px");
-					})
-					.attr("class","rect_button")
-					.attr("id",cur_id)
-					
-					.attr("style",
-								"width:"+width+"px;"+
-								"height:"+height+"px;"+
-								"color:"+font_color+";"+
-								"font-size:"+font_size
-								)
-					.attr("transform",function(d,i){  
-				        return "translate(" + (biasx) + "," + (biasy) + ")";  
-				    }) 
-				    .attr("fill",function(d,i){  
-				        return background_color;  
-				    }) 
-					;
-
-
+		.datum(cur_data)//绑定数据以后，后面的function才能接到d，否则只能接到this
+		.on("mouseover",mouseover_function)
+		.on("click",mouseclick_function)
+		.on("mouseout",function(){
+			mouseout_function(this);
+			tooltip.style("opacity",0.0);
+		})
+		.on("mousemove",function(){
+			// 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 
+			tooltip.style("left", (d3.event.pageX) + "px")
+				.style("top", (d3.event.pageY + 20) + "px");
+		})
+		.attr("class","rect_button")
+		.attr("id",cur_id)
+		.attr("style",
+					"width:"+width+"px;"+
+					"height:"+height+"px;"+
+					"color:"+font_color+";"+
+					"font-size:"+font_size
+					)
+		.attr("transform",function(d,i){  
+		       return "translate(" + (biasx) + "," + (biasy) + ")";  
+		   }) 
+		   .attr("fill",function(d,i){  
+		       return background_color;  
+		   });
 	}
 	$("#default").attr("checked",true);
 	$("#radial-depth-controller").on("click", ".level-btn", function(){
-
 		// $("#radial-depth-controller .level-btn").removeClass("active");
 		var dep = $(this).attr("level");
-
 		shown_depth=dep;
-		
-
 		$("#radial-depth-controller .level-btn").removeClass("active");		
 		
 		for (var i = 0; i <= dep; i++)
