@@ -64,6 +64,11 @@ var radial = function(){
 	            });
             }
             dragDis = dy;
+            var value = dragDis / sliderDivHeight * max;
+        	var finalValue = originArray[i] + value;
+        	finalValue = finalValue > max ? max : finalValue;
+        	finalValue = finalValue < min ? min : finalValue;
+        	changePercentage(finalValue);
         })
         .on("dragend",function(d,i){
         	console.log("dragEnd",dragDis);

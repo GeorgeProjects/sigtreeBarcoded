@@ -59,14 +59,18 @@ var treeSelect = function(){
 	var changeA = true;
 	svg.call(tip);
 	processStatData();
+
 	drawHistogram(timeSortArray_flowsize,datadimMode);
+
 	var chart;
+
 	var scrollWidth = $("#srocllDiv").width();
 	var topWrapperWidth = $("#topWrapper").width();
 	var widthPercentage = Math.round(scrollWidth * 2 / topWrapperWidth * 100);
 	// $("#innerTopRight").css("width", widthPercentage+"%");  
 	// $("#innerTopLeft").css("width", (100 - widthPercentage)+"%");  
-	// ddocument.getElementById('srocllDiv').style.height = svgHeight * 2/3 + "px";
+	//document.getElementById('srocllDiv').style.height = svgHeight * 2/3 + "px";
+
 
 	//给定sortMode和datadimMode以后，决定显示哪一个数据数组
 	function choose_displayArray(sortMode,datadimMode)
@@ -590,6 +594,8 @@ var treeSelect = function(){
 	}
 	SelectTree.OMListen = function(message, data) {
 	    if (message == "percentage") {
+	    	if (datadimMode=="flowsize")
+	    	{
 	    		//发送一个百分比data以后，在当前显示的数据A上画出柱子
 				changePercentage(data[0]);
 			}
