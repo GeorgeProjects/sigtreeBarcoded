@@ -12,13 +12,10 @@ var treeSelect = function(){
 	var propotionArray_nodenum = [];
 	var timeSortArray_nodenum = [];
 
-
-
 	var dataList = timeSortArray_flowsize;
 
 	var sortMode = "time";
 	var datadimMode = "flowsize";
-
 
 	var svg = d3.select("#innerTopLeft")
 		.append("svg")
@@ -32,7 +29,31 @@ var treeSelect = function(){
 			var time = d.time;
 			var aTime = time.replace("XX.csv","");
 			var aValue = d.value;
-		return "<span style='font-size:12px;'>date:" + aTime +"  values:" + aValue +"</span>";
+
+			var aL0Node=d.L0Node;
+			var aL1Node=d.L1Node;
+			var aL2Node=d.L2Node;
+			var aL3Node=d.L3Node;
+			var aL4Node=d.L4Node;
+
+			if (typeof(aL0Node)!="undefined")
+			{
+				return "<span style='font-size:12px;'>	date:" + aTime +
+													"	sumNode:" + aValue +
+													"	L0Node:" + aL0Node +
+													"	L1Node:" + aL1Node +
+													"	L2Node:" + aL2Node +
+													"	L3Node:" + aL3Node +
+													"	L4Node:" + aL4Node +
+													"</span>";
+			}
+			else
+			{
+				return "<span style='font-size:12px;'>	date:" + aTime +
+													"	values:" + aValue +
+													"</span>";
+			}
+		
 		});
 	var hisWidth = 0;
 	var changeA = true;
@@ -94,8 +115,6 @@ var treeSelect = function(){
 		}
 	});
 
-
-	
 	// click on 按树的数值决定高度与树的结点数决定高度之间切换 的 按钮
 	$("#innerTopLeft .datadim-btn").click(function() {
 		$("#innerTopLeft .datadim-btn").removeClass("active");
@@ -154,6 +173,12 @@ var treeSelect = function(){
 			 	timeSortArray_nodenum[i].time = statData[i].file.replace("XX.csv","");
 			 	timeSortArray_nodenum[i].index = i;
 			 	timeSortArray_nodenum[i].position = i;
+
+			 	timeSortArray_nodenum[i].L0Node = + statData[i].L0Node;
+			 	timeSortArray_nodenum[i].L1Node = + statData[i].L1Node;
+			 	timeSortArray_nodenum[i].L2Node = + statData[i].L2Node;
+			 	timeSortArray_nodenum[i].L3Node = + statData[i].L3Node;
+			 	timeSortArray_nodenum[i].L4Node = + statData[i].L4Node;
 			}
 		}
 
@@ -162,9 +187,15 @@ var treeSelect = function(){
 		{
 			for (var i = 0; i < statData.length; i++) {
 			 	propotionArray_nodenum[i] = new Object();
-			 	propotionArray_nodenum[i].value =+ statData[i].sumNode;
+			 	propotionArray_nodenum[i].value = + statData[i].sumNode;
 			 	propotionArray_nodenum[i].time = statData[i].file.replace("XX.csv","");
 			 	propotionArray_nodenum[i].index = i;	
+
+			 	propotionArray_nodenum[i].L0Node = + statData[i].L0Node;
+			 	propotionArray_nodenum[i].L1Node = + statData[i].L1Node;
+			 	propotionArray_nodenum[i].L2Node = + statData[i].L2Node;
+			 	propotionArray_nodenum[i].L3Node = + statData[i].L3Node;
+			 	propotionArray_nodenum[i].L4Node = + statData[i].L4Node;
 			}
 		 	propotionArray_nodenum.sort(function(a, b) {
 		 		return a.value - b.value;
@@ -173,8 +204,6 @@ var treeSelect = function(){
 		 		propotionArray_nodenum[i].position = i;
 		 	}
 		}
-
-
 	}
 
 	function drawHistogram(dataArray,datadimMode){
@@ -224,12 +253,28 @@ var treeSelect = function(){
 			.range([0, height]);
 		var yAxisTicks = [];
 		yAxisTicks[0] = 0;
-		for(var i = 1; ; i = i + 1){
-			yAxisTicks[i] = yAxisTicks[i-1] + 2;
-			if(yAxisTicks[i] > yAxisMax - 2){
-				break;
+
+
+		if (datadimMode=="flowsize")
+		{
+			for(var i = 1; ; i = i + 1){
+				yAxisTicks[i] = yAxisTicks[i-1] + 2;//每隔2标一下
+				if(yAxisTicks[i] > yAxisMax - 2){
+					break;
+				}
 			}
 		}
+		else if (datadimMode=="nodenum")
+		{
+			for(var i = 1; ; i = i + 1){
+				yAxisTicks[i] = yAxisTicks[i-1] + 2/*100*/;//每隔2标一下
+				if(yAxisTicks[i] > yAxisMax - 2/*100*/){
+					break;
+				}
+			}
+		}
+
+		
 		var yAxis = d3.svg.axis()
 			.scale(yAxisScale)
 			.orient("left")
@@ -239,29 +284,59 @@ var treeSelect = function(){
 			.call(yAxis)
 			.append("text")
 			.attr("transform","rotate(-90)")
-			//.attr("transform","translate(" + -10 + "," + 0 + ")")
+			//.attr("transform","translate(" + -5 + "," + 0 + ")")
 			.attr("class","label")
 			.attr("x",10)
 			.attr("y",-25)
 			.style("text-anchor","end")
-			.text("log(Number\n(bytes))");
+			.text(function(){
+					if (datadimMode=="flowsize")
+						return "log(Number\n(bytes))";
+					else if (datadimMode=="nodenum")
+						return "log(Number\n(nodes))";
+				});
 
 		//draw chart bars
 		var xScale = d3.scale.linear()
 					.domain([0, dataArray.length])
 					.range([0, width]);
 
-
-		var yScale = d3.scale.linear()
-					.domain([0, Math.log(maxNum)])
-					.range([height, 0]);
+		if (datadimMode=="flowsize")
+			var yScale = d3.scale.linear()
+								.domain([0, Math.log(maxNum)])
+								.range([height, 0]);
+		else if (datadimMode=="nodenum")
+			var yScale = d3.scale.linear()
+								.domain([0, Math.log(maxNum)])
+								.range([height, 0]);
+					
 
 		hisWidth = xScale(1) - 1;
 
-	 	chart.selectAll(".bar")
+
+		
+		if (datadimMode=="nodenum")
+		{
+			for (var i=1;i<=9;++i)
+			{
+				pile_bars(i);
+			}
+		}
+		else if (datadimMode=="flowsize")
+		{
+			pile_bars(1);
+		}
+		
+		function pile_bars(level)
+		{
+
+			var bias=2;//为了避免L0结点显示不出来而加的bias
+
+			chart.selectAll(/*".bar"*/".bar"+" level-"+level)
 	 		.data(dataArray)
 	 		.enter()
 	 		.append("rect")
+	 		
 	 		.attr("id",function(d, i){
 				return "his-" + d.index;
 			})
@@ -291,15 +366,88 @@ var treeSelect = function(){
 			.attr("width", function() {
 				return xScale(1) - 1;
 			})
-			.attr("height",function(d,i){
-				return height - yScale(Math.log(d.value)) - 1;
+			.attr("height",function(d,i){//height是柱子本身的高度
+				if (datadimMode=="flowsize")
+				{
+					return height - yScale(Math.log(d.value)) - 1;
+				}
+				else if (datadimMode=="nodenum")
+				{
+					
+					//奇数层是灰色的
+					var result;
+					//最高层放L4Node的数量
+					if (level==1)
+						result = height - yScale(Math.log(d.value)) +bias;
+					//次最高层放L3Node的数量
+					else if (level==2)
+						result = height - yScale(Math.log(d.L0Node+d.L1Node+d.L2Node+d.L3Node)) +1+bias;
+					else if (level==3)
+						result = height - yScale(Math.log(d.L0Node+d.L1Node+d.L2Node+d.L3Node)) +bias;
+					//次次高层放L2Node的数量
+					else if (level==4)
+						result = height - yScale(Math.log(d.L0Node+d.L1Node+d.L2Node)) +1+bias;
+					else if (level==5)
+						result = height - yScale(Math.log(d.L0Node+d.L1Node+d.L2Node)) +bias;
+					//次次次高层放L1Node的数量
+					else if (level==6)
+						result = height - yScale(Math.log(d.L0Node+d.L1Node)) +1+bias;
+					else if (level==7)
+						result = height - yScale(Math.log(d.L0Node+d.L1Node)) +bias;
+					//次次次次高层放L0Node的数量
+					else if (level==8)
+						result = height - yScale(Math.log(d.L0Node)) + 1+bias;
+					else if (level==9)
+						result = height - yScale(Math.log(d.L0Node)) + bias;
+
+					
+					if (result <= 0 )
+						console.log (result,level,height,yScale(Math.log(d.L0Node)));
+
+					return result;
+				}
 			})
 			.attr("x",function(d){ 
 				return xScale(d.position) + 1;
 			})
-			.attr("y",function(d){
-				return yScale(Math.log(d.value));
+			.attr("y",function(d){//y是柱子的位置
+				if (datadimMode=="flowsize")
+				{
+					return yScale(Math.log(d.value));
+				}
+				else if (datadimMode=="nodenum")
+				{
+					var result;
+					//最高层放L4Node的数量
+					if (level==1)
+						result = yScale(Math.log(d.value)) -bias;
+					//次最高层放L3Node的数量
+					else if (level==2)
+						result = yScale(Math.log(d.L0Node+d.L1Node+d.L2Node+d.L3Node))-1 -bias;
+					else if (level==3)
+						result = yScale(Math.log(d.L0Node+d.L1Node+d.L2Node+d.L3Node)) -bias;
+					//次次高层放L2Node的数量
+					else if (level==4)
+						result = yScale(Math.log(d.L0Node+d.L1Node+d.L2Node))-1 -bias;
+					else if (level==5)
+						result = yScale(Math.log(d.L0Node+d.L1Node+d.L2Node)) -bias;
+					//次次次高层放L1Node的数量
+					else if (level==6)
+						result = yScale(Math.log(d.L0Node+d.L1Node))-1 -bias;
+					else if (level==7)
+						result = yScale(Math.log(d.L0Node+d.L1Node)) -bias;
+					//次次次次高层放L0Node的数量
+					else if (level==8)
+						result = yScale(Math.log(d.L0Node))-1 -bias;
+					else if (level==9)
+						result = yScale(Math.log(d.L0Node)) -bias;
+
+					return result;
+				}
 			})
+
+			.classed(("level-"+level),true)
+
 			.on("mouseover",tip.show)
 			.on("mouseout",tip.hide)
 			.on('click',function(d,i){
@@ -319,6 +467,11 @@ var treeSelect = function(){
 				changeComparedData();
 				d3.select("#append-rect").select("#percen-rect").remove();
 			});
+		
+
+		}
+		
+
 
 		// draw x-axis ticks
 		if (sortMode == "time") {
@@ -335,26 +488,41 @@ var treeSelect = function(){
 				}
 			}			
 		}
+	
+
 		changeComparedData();
 		function changeComparedData() {
+
+			if(changeA){
+				d3.selectAll(".selected_seperate_bar")
+					.classed("selected_seperate_bar", false)//去红色
+					.classed("current", true);//加蓝色
+			}else{
+				d3.selectAll(".selected_seperate_bar")
+					.classed("selected_seperate_bar", false)//去红色
+					.classed("change-current", true);//加蓝色
+			}
+			
+			
+
 			chart.selectAll(".previous").classed("previous", false);
 			chart.selectAll(".current").classed("current", false);
 			chart.selectAll(".change-previous").classed("change-previous", false);
 			chart.selectAll(".change-current").classed("change-current", false);
 			if(changeA){
-				chart.select("#his-" + compareArray[0]).classed("previous", true);
-				chart.select("#his-" + compareArray[1]).classed("current", true);
+				chart.selectAll("#his-" + compareArray[0]).classed("previous", true);
+				chart.selectAll("#his-" + compareArray[1]).classed("current", true);
 			}else{
-				chart.select("#his-" + compareArray[0]).classed("change-previous", true);
-				chart.select("#his-" + compareArray[1]).classed("change-current", true);
+				chart.selectAll("#his-" + compareArray[0]).classed("change-previous", true);
+				chart.selectAll("#his-" + compareArray[1]).classed("change-current", true);
 			}
 			
 			chart.selectAll(".labelAB").remove();
 
 			for(var l = 0; l < compareArray.length; l++){
 				var id = compareArray[l];
-				var x = chart.select("#his-" + id).attr("x");
-				var y = chart.select("#his-" + id).attr("y") - 3;
+				var x = chart.selectAll("#his-" + id).attr("x");
+				var y = chart.selectAll("#his-" + id).attr("y") - 3;
 				chart
 					.append("text")
 					.attr("class","labelAB")
@@ -426,8 +594,53 @@ var treeSelect = function(){
 	}
 	SelectTree.OMListen = function(message, data) {
 	    if (message == "percentage") {
-	    	//发送一个百分比data以后，在当前显示的数据A上画出柱子
-			changePercentage(data);
+	    	if (datadimMode=="flowsize")
+	    	{
+	    		//发送一个百分比data以后，在当前显示的数据A上画出柱子
+				changePercentage(data[0]);
+			}
+			else if (datadimMode=="nodenum")
+			{
+				var cur_depth=data[1];
+				var cur_level=9-2*cur_depth;
+				console.log(d3.selectAll(".current").selectAll(".level-"+cur_level));
+
+				console.log(changeA)
+				if(changeA)
+				{
+					d3.selectAll(".selected_seperate_bar")
+						.classed("selected_seperate_bar", false)//去红色
+						.classed("current", true);//加蓝色
+
+					d3.selectAll(".current" + ".level-"+cur_level)
+						.classed("selected_seperate_bar", true);//加红色
+
+					d3.selectAll(".current" + ".level-"+cur_level)
+						.classed("current", false);//去掉原来的蓝色标记	
+				}
+				else
+				{
+					d3.selectAll(".selected_seperate_bar")
+						.classed("selected_seperate_bar", false)//去红色
+						.classed("change-current", true);//加蓝色
+
+					d3.selectAll(".change-current" + ".level-"+cur_level)
+						.classed("selected_seperate_bar", true);//加红色
+
+					d3.selectAll(".change-current" + ".level-"+cur_level)
+						.classed("change-current", false);//去掉原来的蓝色标记	
+				}
+			
+				
+
+
+				
+				
+
+				
+				
+				
+			}
 	    }
 	    if (message == "show-detail-info") {
 	    	var dataset = data.dataset;

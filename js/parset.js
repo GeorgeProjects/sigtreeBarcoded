@@ -1,5 +1,6 @@
-var parset = function(){
 
+var parset = function(){
+	
 	var Parset = {};
 	ObserverManager.addListener(Parset);	
 

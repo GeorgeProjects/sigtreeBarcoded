@@ -748,7 +748,8 @@ var radial = function(){
 		    	.classed('path-highlight',true);
 		    svg.selectAll('.c-' + thisIndex)
 		    	.classed('father-highlight',true);
-		    ObserverManager.post("percentage",acc_depth_node_num[d._depth]/linear_tree.length);
+		    //changed
+		    ObserverManager.post("percentage",[acc_depth_node_num[d._depth]/linear_tree.length , d._depth]);
 		})
 		.on('mouseout',function(d,i){
 			svg.selectAll('.bar-class')
