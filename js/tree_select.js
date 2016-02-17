@@ -603,9 +603,9 @@ var treeSelect = function(){
 			{
 				var cur_depth=data[1];
 				var cur_level=9-2*cur_depth;
-				console.log(d3.selectAll(".current").selectAll(".level-"+cur_level));
+				//console.log(d3.selectAll(".current").selectAll(".level-"+cur_level));
 
-				console.log(changeA)
+				//console.log(changeA)
 				if(changeA)
 				{
 					d3.selectAll(".selected_seperate_bar")
