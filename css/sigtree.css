@@ -1,3 +1,6 @@
+.text{
+  font-size: 12px;
+}
 /* D3.tips */
 .d3-tip {
   line-height: 1.5em;
@@ -177,12 +180,37 @@ path[class~=focus-highlight], circle[class~=focus-highlight], rect[class~=focus-
 #depth-control{
   width:100%;
   height:40%;
+  text-align: center;
+  padding-top: 10px;
+  background-color: rgb(240,240,240);
 }
 #slider-control{
   width:100%;
-  height:50%;
+  height:58%;
+  margin-top: 2px;
+  background-color: rgb(240,240,240);
+}
+#bottom-value{
+  width:100%;
+  height:8%;
+  text-align: center;
+}
+#slider-view{
+  width:100%;
+  height:84%;
+}
+#top-value{
+  width:100%;
+  height:8%;
+  text-align: center;
 }
 #radial-draw-svg{
   width:90%;
   height:100%;
+}
+#max-value{
+  font-weight: bold;
+}
+#min-value{
+
 }

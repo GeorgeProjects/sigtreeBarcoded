@@ -11,12 +11,13 @@
         <link rel="stylesheet" type="text/css" href="css/tree_compare.css">
     	<link rel="stylesheet" type="text/css" href="css/radial.css">  
         <link rel="stylesheet" type="text/css" href="css/parset.css">  
+        <link rel="stylesheet" type="text/css" href="libs/jquery-ui.css">
     </head>
 
     <body>
         <div class="navbar navbar-default navbar-fixed-top">
             <div class="container">
-                <strong class="navbar-brand" style="height:30px">复杂通信业务概览可视化</strong>
+                <strong class="navbar-brand" style="height:30px">SignalTree Barcoded</strong>
 
                 <div class="navbar-collapse collapse">
                     <span class="nav navbar-nav navbar-right">
@@ -135,14 +136,22 @@
         <div id="leftTopWrapper" class="row">
             <div id="radial-depth-controller" class="col-md-6">
                 <div id='depth-control'>
-                 <div id="label-A"><span class="btn btn-default btn-xs label">A</span></div><br/>
-                 <div class="btn btn-default btn-xs active level-btn" level=0>L0</div><br/>
-                 <div class="btn btn-default btn-xs active level-btn" level=1>L1</div><br/>
-                 <div class="btn btn-default btn-xs active level-btn" level=2>L2</div><br/>
-                 <div class="btn btn-default btn-xs active level-btn" level=3>L3</div><br/>
-                 <div class="btn btn-default btn-xs active level-btn" level=4>L4</div><br/>
+                     <div id="label-A"><span class="btn btn-default btn-xs label">A</span></div><br/>
+                     <div class="btn btn-default btn-xs active level-btn" level=0>L0</div><br/>
+                     <div class="btn btn-default btn-xs active level-btn" level=1>L1</div><br/>
+                     <div class="btn btn-default btn-xs active level-btn" level=2>L2</div><br/>
+                     <div class="btn btn-default btn-xs active level-btn" level=3>L3</div><br/>
+                     <div class="btn btn-default btn-xs active level-btn" level=4>L4</div><br/>
                  </div>
-                 <div id='slider-control'></div>
+                 <div id='slider-control'>
+                    <div id='bottom-value'>
+                        <center id='now-value'></center>
+                    </div>
+                    <div id='slider-view'></div>
+                    <div id='top-value'>
+                        <center id='max-value'>30</center>
+                    </div>
+                 </div>
             </div>
             <div id="radial-draw-svg" class="col-md-6">
             </div>
@@ -160,6 +169,7 @@
     <script type="text/javascript" src="libs/d3.tip.js"></script>
     <script type="text/javascript" src="libs/queue.js"></script>
     <script type="text/javascript" src="libs/Underscore.js"></script>
+    <script type="text/javascript" src="libs/jquery-ui.js"></script>
 
     <!-- utils js -->
     <script type="text/javascript" src="js/sigtree.js"> </script>
@@ -167,9 +177,7 @@
     <script type="text/javascript" src="js/utils.js"> </script>
     <script type="text/javascript" src="js/data_processor.js"> </script>
     <script type="text/javascript" src="js/combinator.js"> </script>
-
     <script type="text/javascript" src="libs/d3.parsets/d3.parsets.js"></script>    
-
 
     <script type="text/javascript" src="js/tree_compare.js"></script>
 	<script type="text/javascript" src="js/radial.js"></script> 

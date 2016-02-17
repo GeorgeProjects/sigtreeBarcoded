@@ -98,11 +98,17 @@
   path[class~=father-highlight]{
     stroke:brown;
   }
+  rect[class~=slider-hover]{
+    fill:steelblue;
+  }
   .line {
     fill: none;
     stroke: steelblue;
     stroke-width: 1.5px;
     opacity: 0;
+  }
+  .slider{
+    fill:#2060d5;
   }
 /*end of 提示框css*/
 

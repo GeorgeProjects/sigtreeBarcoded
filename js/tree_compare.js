@@ -5,10 +5,6 @@ var treeCompare = function(){
 
 	var datasets = dataCenter.datasets;
 
-	// var combine1 = sigtree.combinator().by_index(true);
-	// var combine2 = sigtree.combinator().compare(function(d1,d2){return d1.key.localeCompare(d2.key)});
-	// var merge_tree = sigtree.merge_tree(combine2);
-
 	var duration = 1750;
 	var ratio = 1.5;
 

@@ -6,64 +6,116 @@ var svg = d3.select("#radial-draw-svg")
 	.attr("id","radial")
 	.attr("width", width)
 	.attr("height", height);
-var sliderDivHeight = $("#slider-control").height();
-var sliderDivWidth = $("#slider-control").width();
-var sliderSvg = d3.select("#slider-control")
+var sliderDivHeight = $("#slider-view").height();
+var sliderDivWidth = $("#slider-view").width();
+var sliderSvg = d3.select("#slider-view")
 	.append("svg")
 	.attr("id","slider-svg")
 	.attr("width",sliderDivWidth)
 	.attr("height",sliderDivHeight);
-
 var radial = function(){
 	var widthArray = [24, 18, 12, 6, 2];
+	var originArray = [];
+	for(var i = 0; i < widthArray.length; i++){
+		originArray[i] = widthArray[i];
+	}
+	var topHeight = height * 0.446;
+	var bottomHeight = topHeight + sliderDivHeight;
+	console.log("height:" + topHeight);
+	console.log("bottomHeight:" + bottomHeight);
+	console.log("sliderHeight:" + sliderDivHeight);
 	var rectHeight = 60;
 	var rectY = 10;
-	var xCompute = 0;	
-	
+	var xCompute = 0;
 	var Radial = {};
 	ObserverManager.addListener(Radial);
-
 
 	var dataProcessor = dataCenter.datasets[0].processor;
 	var dataset = dataCenter.datasets[0].processor.result;
 
 	var min = 0;
 	var max = 30;
-	var sliderHeight = sliderDivHeight * 4 / 5;
+	var sliderHeight = sliderDivHeight;
 	var sliderWidth = sliderDivWidth * 2 / 10;
-	sliderSvg
-		.append("g")
+	var linear_tree=[];
+
+	sliderSvg.append("g")
 		.attr("id","slider-g")
-		.attr("transform","translate(" + sliderDivWidth * 4 / 10 + "," + sliderDivHeight * 1 / 10 + ")")
+		.attr("transform","translate(" + sliderDivWidth * 4 / 10 + "," + 0 + ")");
+
+	sliderSvg.select("#slider-g")
 		.append("rect")
+		.attr("id","back-slider")
 		.attr("height",sliderHeight)
 		.attr("width",sliderWidth)
 		.attr("x",0)
 		.attr("y",0)
 		.attr("fill","gray");
 
+	var dragDis = 0;
+	var drag = d3.behavior.drag()
+        .on("drag", function(d,i) {
+        	var oy = originArray[i] / max * sliderHeight;
+            var dx = +d3.event.x;
+            var dy = +d3.event.y - oy;
+            if((d3.event.y > 0)&&(d3.event.y < sliderHeight - sliderHeight/50)){
+            	d3.select(this).attr("transform", function(d,i){
+	                return "translate(" + 0 + "," + dy + ")";
+	            });
+            }
+            dragDis = dy;
+        })
+        .on("dragend",function(d,i){
+        	console.log("dragEnd",dragDis);
+        	var value = dragDis / sliderDivHeight * max;
+        	var finalValue = originArray[i] + value;
+        	finalValue = finalValue > max ? max : finalValue;
+        	finalValue = finalValue < min ? min : finalValue;
+        	widthArray[i] = finalValue;
+        	draw_barcoded_tree(linear_tree,1,100);
+        	changePercentage(finalValue);
+        });
+
 	sliderSvg.select("#slider-g")
 		.selectAll(".slider")
 		.data(widthArray)
 		.enter()
 		.append("rect")
-		.attr("x",-3)
+		.attr("class","slider")
+		.attr("id",function(d,i){
+			return "slider-" + i;
+		})
+		//.attr("transform", function(d,i){
+		//	var value = +d;
+		//	return "translate(" + -sliderWidth/4 + "," + value / max * sliderHeight + ")";
+		//})
+		.attr("x",-sliderWidth/4)
 		.attr("y",function(d,i){
 			var value = +d;
 			return value / max * sliderHeight; 
 		})
-		.attr("width",13)
-		.attr("height",5)
-		.attr("fill","steelblue");
-		//.call(drag);
-
-	var drag = d3.behavior.drag()
-    	.on("drag", dragmove);
-
-	function dragmove(d) {
-	  var y = d3.event.y;
-	  d3.select(this).attr("transform", "translate(" + 0 + "," + y + ")");
-	}
+		.attr("width",sliderWidth + sliderWidth/2)
+		.attr("height",sliderHeight/50)
+		.on("mouseover",function(d,i){
+			d3.select(this).classed("slider-hover",true);
+			console.log("drag");
+			changePercentage(widthArray[i]);
+		})
+		.on("mouseout",function(d,i){
+			d3.select(this).classed("slider-hover",false);
+			clearPercentage();
+		})
+		.call(drag);
+	/*sliderSvg.append("text")
+		.attr("id","text-0")
+		.attr("x",0)
+		.attr("y",0)
+		.attr("width",3)
+		.attr("height",3)
+		.text("0")
+		.attr("font-family","sans-serif")
+		.attr("font-size","20px")
+		.attr("fill","red");*/
 	//注意：JS中函数参数传递不是按引用传的
 	//函数内部如果直接给传入的对象赋值，效果是对内部的拷贝赋值；如果修改传入的对象的成员，那么修改能够影响到传入的对象
 
@@ -80,12 +132,19 @@ var radial = function(){
 		//如果用sunburst的layout，上层的size会自己算出来，否则需要手动算才有
 		_father: undefined
 	}
-
 	//用数组存储公共树
-	var linear_tree=[];
-
 	merge_preprocess_rawdata(dataset.dataList,target_root,1);
 
+	function changePercentage(text){
+		text = +text;
+		var format_text = parseFloat(Math.round(text * 100) / 100).toFixed(2);
+		d3.select("#now-value")
+			.html(format_text);
+	}
+	function clearPercentage(){
+		d3.select("#now-value")
+			.html(null);
+	}
 	//把traverse和需要使用的局部静态变量包起来
 	function linearlize(root,target_linear_tree)
 	{
@@ -665,6 +724,7 @@ var radial = function(){
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index，要画的高度位置cur_biasy
 	function draw_barcoded_tree(linear_tree,cur_tree_index,cur_biasy)
 	{
+		xCompute = 0;
 		var acc_depth_node_num=[];//记录各个深度的结点数
 		for (var i=0;i<=4;++i){
 			acc_depth_node_num[i]=0;
@@ -816,7 +876,7 @@ var radial = function(){
 				var str = 	"L0 to L4" + " node number:"+
 							(acc_depth_node_num[0]+acc_depth_node_num[1]+
 							 acc_depth_node_num[2]+acc_depth_node_num[3]+acc_depth_node_num[4]);
-			draw_text_description(str,text_x,text_y);
+			//draw_text_description(str,text_x,text_y);
 		}
 		//给出text标注每个深度的结点分别有多少个
 		function draw_text_description(str,text_x,text_y)
