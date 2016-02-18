@@ -373,76 +373,161 @@
 		return reg.test(str);
 	}
 
-//传入root以后，将tree的每个结点的孩子的顺序，按照分叉从少到多，对每个结点的children重新排序
-function reorder_lineartree(root)
+//传入root以后，将tree的每个结点的孩子的顺序，按照直接分叉从少到多，对每个结点的children重新排序
+//直接分叉数量相同的结点暂时先不规定顺序
+function reorder_tree(root)
 {
-	for (var i=0;i<target_linear_tree.length;++i)
+	reorder_tree_traverse(root);
+	function reorder_tree_traverse(root)
 	{
-		var cur_node=target_linear_tree[i];
-		var cur_children_group=cur_node.children;
-		if (typeof(cur_children_group)=="undefined")
-			continue;
+		if (typeof(root)=="undefined")
+			return;
 
-		for (var j=0;j<cur_children_group.length;++j)
+		var cur_children_group=root.children;
+		if (typeof(root.children)=="undefined")
+			return;
+		
+		var cur_children_group_size=cur_children_group.length;
+		if (cur_children_group_size!=1)
 		{
-			
-			for (var k=j+1;k<cur_children_group.length;++k)
+			for (var i=cur_children_group_size-1;i>=0;--i)
 			{
-				var cur_child_1=cur_children_group[j];
-				var cur_child_2=cur_children_group[k];
-
-				var cur_child_1_branchnum=0;
-				if (typeof(cur_child_1.children)!="undefined")
-					cur_child_1_branchnum=cur_child_1.children.length;
-
-				var cur_child_2_branchnum=0;
-				if (typeof(cur_child_2.children)!="undefined")
-					cur_child_2_branchnum=cur_child_2.children.length;
-
-				//要让孩子数更少的结点排在前面
-				if (cur_child_1_branchnum > cur_child_2_branchnum)
+				for (var j=i-1;j>=0;--j)
 				{
-					cur_children_group[k]=cur_child_1;
-					cur_children_group[j]=cur_child_2;
+					var cur_child_1=cur_children_group[j];
+					var cur_child_2=cur_children_group[i];
+
+					var cur_child_1_branchnum=0;
+					if (typeof(cur_child_1.children)!="undefined")
+						cur_child_1_branchnum=cur_child_1.children.length;
+
+					var cur_child_2_branchnum=0;
+					if (typeof(cur_child_2.children)!="undefined")
+						cur_child_2_branchnum=cur_child_2.children.length;
+
+					//要让孩子数更少的结点排在前面
+					if (cur_child_1_branchnum > cur_child_2_branchnum)
+					{
+
+						cur_children_group[i]=cur_child_1;
+						cur_children_group[j]=cur_child_2;
+					}
 				}
 			}
-
 		}
-
+		//对每个子递归地整理顺序
+		for (var i=0;i<cur_children_group_size;++i)
+		{
+			reorder_tree_traverse(root.children[i]);
+		}
 	}
 }	
 
-//传入root
-function cal_redunduncy_time(root)
+
+
+//传入root以后，对于每个结点，标记这个结点与他的所有兄弟组成的结点组中
+//按照下标来看，在他的下标之后包括他本身，有多少个连续的子树结构相同的兄弟结点
+function cal_repeat_time(root)
 {
-
-}
-	
-
-//把traverse和需要使用的局部静态变量包起来
-	function linearlize(root,target_linear_tree)
+	cal_repeat_time_traverse(root);
+	function cal_repeat_time_traverse(root)
 	{
-		//traverse递归中要保持的static变量
-		var cur_index = 0;
-		//传入树根和用于存储线性化的树的数组
-		//traverse中按深度优先进行线性化以及标记每个结点的linear_index
-		function traverse(root,target_linear_tree)
+		if (typeof(root)=="undefined")
+			return;
+
+		if (typeof(root._father)=="undefined")
 		{
-			if (typeof(root)=="undefined")
-				return;
-
-			root.linear_index=cur_index;//记录每个结点在数组中的index
-			target_linear_tree[cur_index]=root;
-
-			if (typeof(root.children)=="undefined")
-				return;
-
-			var cur_root_children_num=root.children.length;
-			for (var i=0;i<cur_root_children_num;++i)
+			root.continuous_repeat_time=1;
+		}
+		else
+		{
+			var root_sibling_group=root._father.children;
+			var root_route=root.route;
+			var root_index=0;
+			for (var i=0;i<root_sibling_group.length;++i)
 			{
-				cur_index=cur_index+1;
-				traverse(root.children[i],target_linear_tree);
+				var cur_sibling=root_sibling_group[i];
+				if (cur_sibling.route==root_route)
+				{
+					var root_index=i;
+					break;
+				}
+			}
+			var count_continuous_same_subtree=1;
+			for (var i=root_index+1;i<root_sibling_group.length;++i)
+			{
+				var cur_sibling=root_sibling_group[i];
+				var flag=tree_equality_compare(root,cur_sibling);
+				if (flag==1)
+					count_continuous_same_subtree=count_continuous_same_subtree+1;
+				else
+					break;
+			}
+			root.continuous_repeat_time=count_continuous_same_subtree;
+		}
+
+		var cur_children_group=root.children;
+		if (typeof(root.children)=="undefined")
+			return;
+		var cur_children_group_size=cur_children_group.length;
+		//对每个子递归计算
+		for (var i=0;i<cur_children_group_size;++i)
+		{
+			cal_repeat_time_traverse(root.children[i]);
+		}
+	}
+
+	//比较root1和root2对应的树的结构是否完全相同，返回0或1
+	function tree_equality_compare(root1,root2)
+	{
+		if (typeof(root1)=="undefined" && typeof(root2)=="undefined")
+			return 1;
+		if (typeof(root1)!="undefined" && typeof(root2)!="undefined")
+		{
+			if (typeof(root1.children)=="undefined" && typeof(root2.children)=="undefined")
+				return 1;
+			if (typeof(root1.children)!="undefined" && typeof(root2.children)!="undefined")
+			{
+				if (root1.children.length == root2.children.length)
+				{
+					var flag=1;
+					for (var i=0;i<root1.children.length;++i)
+					{
+						flag=flag && tree_equality_compare(root1.children[i],root2.children[i]);
+					}
+					return flag;
+				}
 			}
 		}
-		traverse(root,target_linear_tree);
+		return 0;
 	}
+}
+
+
+//把traverse和需要使用的局部静态变量包起来
+function linearlize(root,target_linear_tree)
+{
+	//traverse递归中要保持的static变量
+	var cur_index = 0;
+	//传入树根和用于存储线性化的树的数组
+	//traverse中按深度优先进行线性化以及标记每个结点的linear_index
+	function traverse(root,target_linear_tree)
+	{
+		if (typeof(root)=="undefined")
+			return;
+
+		root.linear_index=cur_index;//记录每个结点在数组中的index
+		target_linear_tree[cur_index]=root;
+
+		if (typeof(root.children)=="undefined")
+			return;
+
+		var cur_root_children_num=root.children.length;
+		for (var i=0;i<cur_root_children_num;++i)
+		{
+			cur_index=cur_index+1;
+			traverse(root.children[i],target_linear_tree);
+		}
+	}
+	traverse(root,target_linear_tree);
+}

@@ -52,7 +52,13 @@ var radial = function(){
 	//函数内部如果直接给传入的对象赋值，效果是对内部的拷贝赋值；如果修改传入的对象的成员，那么修改能够影响到传入的对象
 
 	merge_preprocess_rawdata(dataset.dataList,target_root,1);
+
+	reorder_tree(target_root);
+	cal_repeat_time(target_root);
+
 	linearlize(target_root,linear_tree);
+
+	console.log(target_root);
 
 	draw_slide_bar();
 	function draw_slide_bar(){
