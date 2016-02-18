@@ -99,8 +99,30 @@
   path[class~=father-highlight]{
     stroke:brown;
   }
-  rect[class~=slider-hover]{
-    fill:steelblue;
+  rect[class~=slider-hover-0]{
+    fill:#b3e2cd;
+    stroke: #b3e2cd;
+    stroke-width:1.5px;
+  }
+  rect[class~=slider-hover-1]{
+    fill:#fdcdac;
+    stroke: #fdcdac;
+    stroke-width:1.5px;
+  }
+  rect[class~=slider-hover-2]{
+    fill:#cbd5e8;
+    stroke: #cbd5e8;
+    stroke-width:1.5px;
+  }
+  rect[class~=slider-hover-3]{
+    fill:#f4cae4;
+    stroke: #f4cae4;
+    stroke-width:1.5px;
+  }
+  rect[class~=slider-hover-4]{
+    fill:#e6f5c9;
+    stroke: #e6f5c9;
+    stroke-width:1.5px;
   }
   .line {
     fill: none;
@@ -109,7 +131,21 @@
     opacity: 0;
   }
   .slider{
-    fill:#2060d5;
+  }
+  rect[class~=hover-depth-0]{
+    fill:#b3e2cd;
+  }
+  rect[class~=hover-depth-1]{
+    fill:#fdcdac;
+  }
+  rect[class~=hover-depth-2]{
+    fill:#cbd5e8;
+  }
+  rect[class~=hover-depth-3]{
+    fill:#f4cae4;
+  }
+  rect[class~=hover-depth-4]{
+    fill:#e6f5c9;
   }
 
 

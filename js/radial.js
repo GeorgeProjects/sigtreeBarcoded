@@ -30,7 +30,7 @@ var radial = function(){
 	var xCompute = 0;
 	var Radial = {};
 	ObserverManager.addListener(Radial);
-
+	var handleColor = ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9"];
 	var dataProcessor = dataCenter.datasets[0].processor;
 	var dataset = dataCenter.datasets[0].processor.result;
 
@@ -70,18 +70,17 @@ var radial = function(){
 		var max = 30;
 		var sliderHeight = sliderDivHeight;
 		var sliderWidth = sliderDivWidth * 2 / 10;
-
 		sliderSvg.append("g")
 			.attr("id","slider-g")
 			.attr("transform","translate(" + sliderDivWidth * 4 / 10 + "," + 0 + ")");
-
+		var sliderHandleHeight = sliderHeight/30;
 		var dragDis = 0;
 		var drag = d3.behavior.drag()
 	        .on("drag", function(d,i) {
 	        	var oy = originArray[i] / max * sliderHeight;
 	            var dx = +d3.event.x;
 	            var dy = +d3.event.y - oy;
-	            if((d3.event.y > 0)&&(d3.event.y < sliderHeight - sliderHeight/50)){
+	            if((d3.event.y > 0)&&(d3.event.y < sliderHeight - sliderHandleHeight)){
 	            	d3.select(this).attr("transform", function(d,i){
 		                return "translate(" + 0 + "," + dy + ")";
 		            });
@@ -129,14 +128,21 @@ var radial = function(){
 				return value / max * sliderHeight; 
 			})
 			.attr("width",sliderWidth + sliderWidth/2)
-			.attr("height",sliderHeight/50)
+			.attr("height",sliderHandleHeight)
+			.attr("fill",function(d,i){
+				return handleColor[i];
+			})
 			.on("mouseover",function(d,i){
-				d3.select(this).classed("slider-hover",true);
-				console.log("drag");
+				d3.select(this).classed("slider-hover-" + i,true);
+				console.log("i:" + i);
+				var changeClass = "hover-depth-" + i;
+				d3.selectAll(".num-" + i).classed(changeClass,true);
 				changePercentage(widthArray[i]);
 			})
 			.on("mouseout",function(d,i){
-				d3.select(this).classed("slider-hover",false);
+				var changeClass = "hover-depth-" + i;
+				d3.select(this).classed("slider-hover-" + i,false);
+				d3.selectAll(".num-" + i).classed(changeClass,false);
 				clearPercentage();
 			})
 			.call(drag);
@@ -255,7 +261,7 @@ var radial = function(){
 			if(d._father!=undefined){
 				fatherIndex = d._father.linear_index;
 			}
-			return 'bar-class num-' + d._depth + 'father-' + fatherIndex;
+			return 'bar-class num-' + d._depth + ' father-' + fatherIndex;
 		})
 		.attr('id',function(d,i){
 			return  'bar-id' + d.linear_index;
@@ -281,7 +287,7 @@ var radial = function(){
 			if(d._father!=undefined){
 				fatherIndex = d._father.linear_index;
 			}
-			svg.selectAll('.num-' + d._depth + 'father-' + fatherIndex)
+			svg.selectAll('.num-' + d._depth + ' father-' + fatherIndex)
 				.classed("sibiling-highlight",true);
 			var fatherId = 0;
 			if(d._father!=undefined){
