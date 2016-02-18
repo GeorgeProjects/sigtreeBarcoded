@@ -149,4 +149,15 @@
   }
 
 
+/*
+#triangle {
+    width: 0;
+    height: 0;
+
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 16px solid red;
+}  
+*/
+
 /*end of change*/
