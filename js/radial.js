@@ -155,15 +155,16 @@ var radial = function(){
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	function draw_barcoded_tree_depth(linear_tree,cur_tree_index,depth){
+	function draw_barcoded_tree_depth(linear_tree,former_depth,depth){
 		console.log(depth);
 		xCompute = 0;
 		var formerWidthArray = [];
+		var currentDepth = former_depth - 1;
 		for(var i = 0;i < changeWidthArray.length;i++){
 			formerWidthArray[i] = changeWidthArray[i];
 		}
 		for(var i = 0; i < widthArray.length; i++){
-			if(i > depth){
+			if(i > currentDepth){
 				changeWidthArray[i] = 0;
 			}else{
 				changeWidthArray[i] = widthArray[i];
@@ -190,10 +191,10 @@ var radial = function(){
 			return rectHeight;
 		})
 		.call(endall, function() { 
-			draw_depth_move(depth);
+			draw_depth_move(currentDepth,depth);
 		});
-		function draw_depth_move(depth){
-			console.log(depth);
+		function draw_depth_move(currentDepth,depth){
+			console.log(currentDepth);
 			console.log(changeWidthArray);
 			xCompute = 0;
 			svg.selectAll('rect')
@@ -216,19 +217,30 @@ var radial = function(){
 				return rectHeight;
 			})
 			//call 相当于定义一个函数，再把选择的元素给它
-			.call(endall, function() { draw_link(); });
+			.call(endall, function(){
+				depth = +depth;
+				currentDepth = +currentDepth;
+				if(currentDepth == depth){
+					draw_link(); 
+				}else{
+					draw_barcoded_tree_depth(linear_tree,currentDepth,depth)
+				}
+			});
 		} 
 	}
 	//-----------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------
-	function draw_barcoded_tree_move(linear_tree,cur_tree_index,depth){
+	function draw_barcoded_tree_move(linear_tree,former_depth,depth){
 		xCompute = 0;
 		var formerWidthArray = [];
+		console.log("former_depth:"+former_depth+"depth:"+depth);
+		former_depth = +former_depth;
+		var currentDepth = former_depth + 1;
 		for(var i = 0;i < changeWidthArray.length;i++){
 			formerWidthArray[i] = changeWidthArray[i];
 		}
 		for(var i = 0; i < widthArray.length; i++){
-			if(i > depth){
+			if(i > currentDepth){
 				changeWidthArray[i] = 0;
 			}else{
 				changeWidthArray[i] = widthArray[i];
@@ -254,10 +266,10 @@ var radial = function(){
 			return rectHeight;
 		})
 		.call(endall, function() {
-		 	draw_depth_show(depth); 
+		 	draw_depth_show(currentDepth,depth); 
 		});
 		//----------------------------------------------------------
-		function draw_depth_show(depth){
+		function draw_depth_show(currentDepth,depth){
 			xCompute = 0;
 			svg.selectAll('rect')
 			.data(linear_tree)
@@ -278,7 +290,16 @@ var radial = function(){
 			.attr('height',function(d,i){
 				return rectHeight;
 			})
-			.call(endall, function() { draw_link();});
+			.call(endall, function() { 
+				depth = +depth;
+				currentDepth = +currentDepth;
+				if(currentDepth == depth){
+					draw_link();
+				}else{
+					alert("hhhhhhh");
+					draw_barcoded_tree_move(linear_tree,currentDepth,depth)
+				}
+			});
 		}
 	}
 	function endall(transition, callback) { 
@@ -441,6 +462,97 @@ var radial = function(){
 		    	.classed('father-highlight',false);
 
 		    ObserverManager.post("percentage", [0 ,d._depth]);
+		})
+		.on('click',function(d,i){
+			var this_x=this.x.animVal.valueInSpecifiedUnits;
+			var this_y=this.y.animVal.valueInSpecifiedUnits;
+			var this_width=this.width.animVal.valueInSpecifiedUnits;
+			var this_height=this.height.animVal.valueInSpecifiedUnits;
+			
+			draw_adjust_button();
+			function draw_adjust_button()
+			{
+				var rect_attribute_button={
+					
+					height:50,
+					biasx:this_x+this_width/2,
+					biasy:this_y+this_height,
+					cur_id:"ratio_adjust",
+					button_shape: (	"M" + 0 + "," + 0 + 
+									"L" + -6 + ","+ 15 + 
+									"L" + 6 + ","+ 15 +
+									"L" + 0 + "," + 0),
+					background_color: "red",
+					cur_svg:svg,
+					//mouseclick_function:function(d){
+					//	console.log("!!!")	
+					//},
+				};			
+				creat_button(rect_attribute_button);
+				function creat_button(rect_attribute_button){
+					var width = rect_attribute_button.width;  
+					var height = rect_attribute_button.height; 
+					var biasx=rect_attribute_button.biasx;
+					var biasy=rect_attribute_button.biasy;
+					var background_color=rect_attribute_button.background_color;
+					var mouseover_function=rect_attribute_button.mouseover_function;
+					var mouseout_function=rect_attribute_button.mouseout_function;
+					var mouseclick_function=rect_attribute_button.mouseclick_function;
+					var shown_string=rect_attribute_button.button_string;
+					var font_color=rect_attribute_button.font_color;
+					var font_size=rect_attribute_button.font_size;
+					var cur_id=rect_attribute_button.cur_id;
+					var cur_class=rect_attribute_button.cur_class;
+					var cur_data=rect_attribute_button.cur_data;
+					var cur_button_shape=rect_attribute_button.button_shape;
+					var cur_svg=rect_attribute_button.cur_svg;
+			 
+			 		var tooltip=d3.selectAll("#tooltip");
+
+			 		if (typeof(cur_button_shape)=="undefined")
+			 		{
+						var button = cur_svg.append("rect");
+					}
+					else//自定义按钮形状
+					{
+						var button = cur_svg.append("path")
+									 		.attr("d",cur_button_shape)
+									 		.attr("stroke","red")
+									 		.attr("stroke-width",1);
+					}
+
+					button.datum(cur_data)//绑定数据以后，后面的function才能接到d，否则只能接到this
+						.on("mouseover",mouseover_function)
+						.on("click",mouseclick_function)
+
+						.on("mouseout",function(){
+							if (typeof(mouseout_function)!="undefined")
+								mouseout_function(this);
+							tooltip.style("opacity",0.0);
+						})
+						.on("mousemove",function(){
+							// 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 
+							tooltip.style("left", (d3.event.pageX) + "px")
+								.style("top", (d3.event.pageY + 20) + "px");
+						})
+						.attr("class","rect_button")
+						.attr("id",cur_id)
+								
+						.attr("style",
+									"width:"+width+"px;"+
+									"height:"+height+"px;"+
+									"color:"+font_color+";"+
+									"font-size:"+font_size
+									)
+						.attr("transform",function(d,i){  
+							return "translate(" + (biasx) + "," + (biasy) + ")";  
+						}) 
+						.attr("fill",function(d,i){  
+							return background_color;  
+						}) 
+						;
+				}
+			}
 		});
 		//--------------------------------------------------------------
 		var beginRadians = Math.PI/2,
@@ -526,9 +638,9 @@ var radial = function(){
 		for (var i = 0; i <= dep; i++)
 			$("#radial-depth-controller .level-btn[level=" + i + "]").addClass("active");
 		if(formerDepth < dep){
-			draw_barcoded_tree_move(linear_tree,1,dep);
+			draw_barcoded_tree_move(linear_tree,formerDepth,dep);
 		}else if(formerDepth > dep){
-			draw_barcoded_tree_depth(linear_tree,1,dep);
+			draw_barcoded_tree_depth(linear_tree,formerDepth,dep);
 		}
 		formerDepth = dep;
 	});

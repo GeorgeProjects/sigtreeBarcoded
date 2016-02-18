@@ -373,6 +373,52 @@
 		return reg.test(str);
 	}
 
+//传入root以后，将tree的每个结点的孩子的顺序，按照分叉从少到多，对每个结点的children重新排序
+function reorder_lineartree(root)
+{
+	for (var i=0;i<target_linear_tree.length;++i)
+	{
+		var cur_node=target_linear_tree[i];
+		var cur_children_group=cur_node.children;
+		if (typeof(cur_children_group)=="undefined")
+			continue;
+
+		for (var j=0;j<cur_children_group.length;++j)
+		{
+			
+			for (var k=j+1;k<cur_children_group.length;++k)
+			{
+				var cur_child_1=cur_children_group[j];
+				var cur_child_2=cur_children_group[k];
+
+				var cur_child_1_branchnum=0;
+				if (typeof(cur_child_1.children)!="undefined")
+					cur_child_1_branchnum=cur_child_1.children.length;
+
+				var cur_child_2_branchnum=0;
+				if (typeof(cur_child_2.children)!="undefined")
+					cur_child_2_branchnum=cur_child_2.children.length;
+
+				//要让孩子数更少的结点排在前面
+				if (cur_child_1_branchnum > cur_child_2_branchnum)
+				{
+					cur_children_group[k]=cur_child_1;
+					cur_children_group[j]=cur_child_2;
+				}
+			}
+
+		}
+
+	}
+}	
+
+//传入root
+function cal_redunduncy_time(root)
+{
+
+}
+	
+
 //把traverse和需要使用的局部静态变量包起来
 	function linearlize(root,target_linear_tree)
 	{

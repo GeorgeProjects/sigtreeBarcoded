@@ -54,7 +54,6 @@ var treeSelect = function(){
 													"	values:" + aValue +
 													"</span>";
 			}
-		
 		});
 	var hisWidth = 0;
 	var changeA = true;
@@ -71,8 +70,6 @@ var treeSelect = function(){
 	// $("#innerTopRight").css("width", widthPercentage+"%");  
 	// $("#innerTopLeft").css("width", (100 - widthPercentage)+"%");  
 	//document.getElementById('srocllDiv').style.height = svgHeight * 2/3 + "px";
-
-
 	//给定sortMode和datadimMode以后，决定显示哪一个数据数组
 	function choose_displayArray(sortMode,datadimMode)
 	{
@@ -85,8 +82,6 @@ var treeSelect = function(){
 		if (sortMode=="size" && datadimMode=="nodenum")
 			return propotionArray_nodenum;
 	}
-
-
 	// click on sort buttons
 	$("#innerTopLeft .sort-btn").click(function() {
 		$("#innerTopLeft .sort-btn").removeClass("active");
@@ -137,6 +132,7 @@ var treeSelect = function(){
 	//处理好四个数组
 	function processStatData() {
 		process_timeSortArray_flowsize();
+		console.log(statData);
 		function process_timeSortArray_flowsize()
 		{
 			for (var i = 0; i < statData.length; i++) {
@@ -145,6 +141,7 @@ var treeSelect = function(){
 			 	timeSortArray_flowsize[i].time = statData[i].file.replace("XX.csv","");
 			 	timeSortArray_flowsize[i].index = i;
 			 	timeSortArray_flowsize[i].position = i;
+			 	timeSortArray_flowsize[i].sumNode =  + statData[i].sumNode;
 			}
 		}
 
@@ -458,11 +455,8 @@ var treeSelect = function(){
 				}
 			}			
 		}
-	
-
 		changeComparedData();
 		function changeComparedData() {
-
 			if(changeA){
 				d3.selectAll(".selected_seperate_bar")
 					.classed("selected_seperate_bar", false)//去红色
@@ -472,9 +466,6 @@ var treeSelect = function(){
 					.classed("selected_seperate_bar", false)//去红色
 					.classed("change-current", true);//加蓝色
 			}
-			
-			
-
 			chart.selectAll(".previous").classed("previous", false);
 			chart.selectAll(".current").classed("current", false);
 			chart.selectAll(".change-previous").classed("change-previous", false);
@@ -498,21 +489,24 @@ var treeSelect = function(){
 					return timeArray[0];
 				return "";
 			});
-			$("#innerTopRight #label-B .date_description").html(function() {
-				if (compareArray.length > 1) 
-					var timeArray = dataList[compareArray[0]].time.split("-");
-					return timeArray[0];
-				return "";
-			});
-
 			$("#innerTopRight #label-A .value_description").text(function() {
 				if (compareArray.length > 0)  
 					return  d3.format(".3s")(dataList[compareArray[1]].value) + "bytes" ;
 				return "";
 			});
-			$("#innerTopRight #label-B .value_description").text(function() {
-				if (compareArray.length > 1) 
-					return d3.format(".3s")(dataList[compareArray[0]].value) + "bytes";
+			$("#innerTopRight #label-A .level_description").text(function() {
+				if (compareArray.length > 0)
+					var levelDescription = 4;
+					return  levelDescription;
+				return "";
+			});
+			$("#innerTopRight #label-A .node_num_description").text(function() {
+				if (compareArray.length > 0)
+					console.log(dataList[compareArray[1]]);
+					console.log(dataList);
+					var nodeNumDescription = dataList[compareArray[1]].sumNode;
+					console.log("nodeNumDescription:"+nodeNumDescription);
+					return nodeNumDescription;
 				return "";
 			});
 			compareArray[1] = compareNum;
@@ -543,7 +537,6 @@ var treeSelect = function(){
 		$("#innerTopRight #label-C #node-type").removeClass("background-A");
 		$("#innerTopRight #label-C #node-type").removeClass("background-B");
 		$("#innerTopRight #label-C #node-type").addClass("background-" + dataset);
-
 		$("#innerTopRight #label-C #node-description").html(nodeID);
 		$("#innerTopRight #label-C #level-description").html(levelText);
 		$("#innerTopRight #label-C #flow-description").text(flowLevel);
