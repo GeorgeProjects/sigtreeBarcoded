@@ -94,23 +94,6 @@ var treeSelect = function(){
 		}
 	});
 
-	// click on data buttons
-	$("#innerTopLeft .data-btn").click(function() {
-		var command = $(this).attr("data-type");
-		if (command == "switch") {
-			if(changeA){
-				changeA = false;
-			}else{
-				changeA = true;
-			}
-		}
-		if (sortMode == "time") {
-			drawHistogram(choose_displayArray(sortMode,datadimMode),datadimMode);
-		} else if (sortMode == "size") {
-			drawHistogram(choose_displayArray(sortMode,datadimMode),datadimMode);
-		}
-	});
-
 	// click on 按树的数值决定高度与树的结点数决定高度之间切换 的 按钮
 	$("#innerTopLeft .datadim-btn").click(function() {
 		$("#innerTopLeft .datadim-btn").removeClass("active");
@@ -426,19 +409,21 @@ var treeSelect = function(){
 
 			.classed(("level-"+level),true)
 
-			.on("mouseover",tip.show)
-			.on("mouseout",tip.hide)
+			.on("mouseover",function(d,i){
+				console.log(d,this)
+				tip.show(d);
+			})
+			.on("mouseout",function(d,i){
+				tip.hide(d);
+			})
 			.on('click',function(d,i){
 				var selectedID = +d.index;
 				compareNum = selectedID;
 				changeComparedData();
 				d3.select("#append-rect").select("#percen-rect").remove();
 			});
-		
-
 		}
 		
-
 
 		// draw x-axis ticks
 		if (sortMode == "time") {
@@ -451,25 +436,16 @@ var treeSelect = function(){
 						.attr("y", 15)
 						.attr("x", chart.select("#his-" + i).attr("x"))
 						.text(xBegin);
-					
 				}
 			}			
 		}
 		changeComparedData();
 		function changeComparedData() {
-			if(changeA){
-				d3.selectAll(".selected_seperate_bar")
-					.classed("selected_seperate_bar", false)//去红色
-					.classed("current", true);//加蓝色
-			}else{
-				d3.selectAll(".selected_seperate_bar")
-					.classed("selected_seperate_bar", false)//去红色
-					.classed("change-current", true);//加蓝色
-			}
-			chart.selectAll(".previous").classed("previous", false);
+			d3.selectAll(".selected_seperate_bar")
+				.classed("selected_seperate_bar", false)//去红色
+				.classed("current", true);//加蓝色
+			
 			chart.selectAll(".current").classed("current", false);
-			chart.selectAll(".change-previous").classed("change-previous", false);
-			chart.selectAll(".change-current").classed("change-current", false);
 			chart.selectAll("#his-" + compareNum).classed("current", true);
 			
 			chart.selectAll(".labelAB").remove();
@@ -528,7 +504,6 @@ var treeSelect = function(){
 		.attr("y",(newY))
 		.attr("height",rectHeight * percentage)
 		.attr("width",hisWidth)
-		// .attr("fill","#b2df8a");
 		.classed("highlight", true);
 	}
 	changeLabelC("-", 0, 0, 0, 0);
@@ -554,33 +529,16 @@ var treeSelect = function(){
 			{
 				var cur_depth=data[1];
 				var cur_level=9-2*cur_depth;
-				//console.log(d3.selectAll(".current").selectAll(".level-"+cur_level));
 
-				//console.log(changeA)
-				if(changeA)
-				{
-					d3.selectAll(".selected_seperate_bar")
-						.classed("selected_seperate_bar", false)//去红色
-						.classed("current", true);//加蓝色
+				d3.selectAll(".selected_seperate_bar")
+					.classed("selected_seperate_bar", false)//去红色
+					.classed("current", true);//加蓝色
 
-					d3.selectAll(".current" + ".level-"+cur_level)
-						.classed("selected_seperate_bar", true);//加红色
+				d3.selectAll(".current" + ".level-"+cur_level)
+					.classed("selected_seperate_bar", true);//加红色
 
-					d3.selectAll(".current" + ".level-"+cur_level)
-						.classed("current", false);//去掉原来的蓝色标记	
-				}
-				else
-				{
-					d3.selectAll(".selected_seperate_bar")
-						.classed("selected_seperate_bar", false)//去红色
-						.classed("change-current", true);//加蓝色
-
-					d3.selectAll(".change-current" + ".level-"+cur_level)
-						.classed("selected_seperate_bar", true);//加红色
-
-					d3.selectAll(".change-current" + ".level-"+cur_level)
-						.classed("change-current", false);//去掉原来的蓝色标记	
-				}		
+				d3.selectAll(".current" + ".level-"+cur_level)
+					.classed("current", false);//去掉原来的蓝色标记	
 			}
 	    }
 	    if (message == "show-detail-info") {
@@ -591,8 +549,7 @@ var treeSelect = function(){
 	    	var flowLevel = node.flow;
 	    	var treeNodeNum = Array.isArray(node.values) ? node.values.length : 0;
 	    	var sumNodeNum = node.allChilldrenCount;
-	    	changeLabelC(dataset, nodeID, levelText, flowLevel, treeNodeNum, sumNodeNum)
-
+	    	changeLabelC(dataset, nodeID, levelText, flowLevel, treeNodeNum, sumNodeNum);
 	    }
     }
 	return SelectTree;

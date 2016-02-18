@@ -14,6 +14,9 @@ var sliderSvg = d3.select("#slider-view")
 	.attr("width",sliderDivWidth)
 	.attr("height",sliderDivHeight);
 
+//barcode的tip
+var tip_array=[];
+
 var radial = function(){
 	var widthArray = [24, 18, 12, 6, 2];
 	var originArray = [];
@@ -154,14 +157,22 @@ var radial = function(){
 			.call(drag);
 	}
 	
-	draw_barcoded_tree(linear_tree,1);
+	
 	var changeWidthArray = [];
 	for(var i = 0;i < widthArray.length;i++){
 		changeWidthArray[i] = widthArray[i];
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
+	
+
+	draw_barcoded_tree(linear_tree,1);
+
 	function draw_barcoded_tree_depth(linear_tree,former_depth,depth){
+		//按下换depth的button时，要把原来的tip全都删光
+		for (var i=0;i<linear_tree.length;++i)
+			tip_array[i].hide();//hide可以不传参数
+
 		console.log(depth);
 		xCompute = 0;
 		var formerWidthArray = [];
@@ -356,6 +367,10 @@ var radial = function(){
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
 	function draw_barcoded_tree(linear_tree,cur_tree_index)
 	{
+		//在histogram换数据时，要保证原来的tip全都消掉
+		for (var i=0;i<tip_array.length;++i)
+			tip_array[i].hide();//hide可以不传参数
+
 		xCompute = 0;//用于累积当前方块的横坐标
 		var acc_depth_node_num=[];//记录各个深度的结点数
 		for (var i=0;i<=4;++i){
@@ -377,7 +392,7 @@ var radial = function(){
 			maintain_tooltip_display[i]=false;
 		}
 
-		var tip_array=[];
+
 		for (var i=0;i<linear_tree.length;++i)
 		{
 			tip_array[i]=d3.tip()
@@ -462,7 +477,7 @@ var radial = function(){
 		})
 		.on('mouseout',function(d,i){
 			if (!maintain_tooltip_display[d.linear_index])
-				tip_array[d.linear_index].hide(d);
+				tip_array[d.linear_index].hide();//hide可以不传参数
 
 			svg.selectAll('.bar-class')
 			.classed("sibiling-highlight",false);

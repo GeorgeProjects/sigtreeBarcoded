@@ -39,22 +39,10 @@
   fill: #FF0000;
 }
 
-#mainTimeline .previous {
-  fill: #FF7F0E;
-}
-
 #mainTimeline .current {
   fill: #1F77B4;
 }
-#mainTimeline .change-previous {
-  fill: #FF7F0E;
-  stroke: #b2df8a;
-  stroke-width: 2px;
-}
 
-#mainTimeline .change-current {
-  fill: #1F77B4;
-}
 .label-wrapper > .label  {
   pointer-events: none;
   cursor: not-allowed;  
