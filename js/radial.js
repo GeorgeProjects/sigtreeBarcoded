@@ -15,7 +15,7 @@ var sliderSvg = d3.select("#slider-view")
 	.attr("height",sliderDivHeight);
 
 var radial = function(){
-	var widthArray = [24, 18, 12, 6, 2];
+	var widthArray = [24, 18, 12, 6, 2];//每一层的结点的宽度
 	var originArray = [];
 	for(var i = 0; i < widthArray.length; i++){
 		originArray[i] = widthArray[i];
@@ -149,21 +149,17 @@ var radial = function(){
 	}
 	
 	draw_barcoded_tree(linear_tree,1);
-	var changeWidthArray = [];
-	for(var i = 0;i < widthArray.length;i++){
-		changeWidthArray[i] = widthArray[i];
-	}
+
+	//只有当按下改变深度的按钮时，才会调用draw_barcoded_tree_depth
 	function draw_barcoded_tree_depth(linear_tree,cur_tree_index,depth){
 		console.log(depth);
-		xCompute = 0;
-		var formerWidthArray = [];
-		for(var i = 0;i < changeWidthArray.length;i++){
-			formerWidthArray[i] = changeWidthArray[i];
+		xCompute = 0;//用于累积当前方块的横坐标
+		var changeWidthArray = [];
+		for(var i = 0;i < widthArray.length;i++){
+			changeWidthArray[i] = 0;
 		}
 		for(var i = 0; i < widthArray.length; i++){
-			if(i > depth){
-				changeWidthArray[i] = 0;
-			}else{
+			if(i <= depth){//对于深度超过depth的结点，宽度赋为0
 				changeWidthArray[i] = widthArray[i];
 			}
 		}
@@ -171,34 +167,6 @@ var radial = function(){
 		.data(linear_tree)
 		.transition()//过渡动画
 			//.duration(500)
-		.attr('x',function(d,i){
-			var backXCompute = xCompute;
-			if(formerWidthArray[d._depth]!=0){
-				xCompute = xCompute + formerWidthArray[d._depth] + 1;
-			}
-			return backXCompute;
-		})
-		.attr('y',function(d,i){
-			return rectY;
-		})
-		.attr('width',function(d,i){
-			return changeWidthArray[d._depth];
-		})
-		.attr('height',function(d,i){
-			return rectHeight;
-		})
-		.call(endall, function() { 
-			draw_depth_move(depth);
-		});
-		//--------------------------------------------------------------
-	}
-	function draw_depth_move(depth){
-		console.log(depth);
-		console.log(changeWidthArray);
-		xCompute = 0;
-		svg.selectAll('rect')
-		.data(linear_tree)
-		.transition()
 		.attr('x',function(d,i){
 			var backXCompute = xCompute;
 			if(changeWidthArray[d._depth]!=0){
@@ -217,83 +185,15 @@ var radial = function(){
 		})
 		//call 相当于定义一个函数，再把选择的元素给它
 		.call(endall, function() { draw_link(); });
-	} 
-	function draw_barcoded_tree_move(linear_tree,cur_tree_index,depth){
-		xCompute = 0;
-		var formerWidthArray = [];
-		for(var i = 0;i < changeWidthArray.length;i++){
-			formerWidthArray[i] = changeWidthArray[i];
-		}
-		for(var i = 0; i < widthArray.length; i++){
-			if(i > depth){
-				changeWidthArray[i] = 0;
-			}else{
-				changeWidthArray[i] = widthArray[i];
-			}
-		}
-		svg.selectAll('rect')
-		.data(linear_tree)
-		.transition()
-		.attr('x',function(d,i){
-			var backXCompute = xCompute;
-			if(changeWidthArray[d._depth]!=0){
-				xCompute = xCompute + changeWidthArray[d._depth] + 1;
-			}
-			return backXCompute;
-		})
-		.attr('y',function(d,i){
-			return rectY;
-		})
-		.attr('width',function(d,i){
-			return changeWidthArray[d._depth];
-		})
-		.attr('height',function(d,i){
-			return rectHeight;
-		})
-		.call(endall, function() { draw_depth_hide(depth); });
-	}
-	function draw_depth_hide(depth){
-		console.log(depth);
-		xCompute = 0;
-		var formerWidthArray = [];
-		for(var i = 0;i < changeWidthArray.length;i++){
-			formerWidthArray[i] = changeWidthArray[i];
-		}
-		for(var i = 0; i < widthArray.length; i++){
-			if(i > depth){
-				changeWidthArray[i] = 0;
-			}else{
-				changeWidthArray[i] = widthArray[i];
-			}
-		}
-		svg.selectAll('rect')
-		.data(linear_tree)
-		.transition()
-		.attr('x',function(d,i){
-			var backXCompute = xCompute;
-			if(formerWidthArray[d._depth]!=0){
-				xCompute = xCompute + formerWidthArray[d._depth] + 1;
-			}
-			return backXCompute;
-		})
-		.attr('y',function(d,i){
-			return rectY;
-		})
-		.attr('width',function(d,i){
-			return changeWidthArray[d._depth];
-		})
-		.attr('height',function(d,i){
-			return rectHeight;
-		})
-		.call(endall, function() { draw_link();});
+		//--------------------------------------------------------------
 	}
 	function endall(transition, callback) { 
 	    if (transition.size() === 0) { callback() }
 	    var n = 0; 
-	    transition
+	    transition 
 	        .each(function() { ++n; }) 
 	        .each("end", function() { if (!--n) callback.apply(this, arguments); }); 
-	}
+	} 
 	function draw_link(){
 		var depth = 4;
 		svg.selectAll('path').remove();
@@ -333,9 +233,91 @@ var radial = function(){
 		}
 	}
 	var g;
+
+	function creat_button(rect_attribute_button){
+		var width = rect_attribute_button.width;  //画布的宽度
+		var height = rect_attribute_button.height;   //画布的高度
+		var biasx=rect_attribute_button.biasx;
+		var biasy=rect_attribute_button.biasy;
+		var background_color=rect_attribute_button.background_color;
+		var mouseover_function=rect_attribute_button.mouseover_function;
+		var mouseout_function=rect_attribute_button.mouseout_function;
+		var mouseclick_function=rect_attribute_button.mouseclick_function;
+		var shown_string=rect_attribute_button.button_string;
+		var font_color=rect_attribute_button.font_color;
+		var font_size=rect_attribute_button.font_size;
+		var cur_id=rect_attribute_button.cur_id;
+		var cur_class=rect_attribute_button.cur_class;
+		var cur_data=rect_attribute_button.cur_data;
+		var cur_button_shape=rect_attribute_button.button_shape;
+		var cur_svg=rect_attribute_button.cur_svg;
+ 
+ 		var tooltip=d3.selectAll("#tooltip");
+
+
+ 		var cur_group=svg;
+
+ 		if (typeof(cur_button_shape)=="undefined")
+ 		{
+			var button = cur_group.append("rect");
+		}
+		else//自定义按钮形状
+		{
+			var button = cur_group.append("path")
+						 		.attr("d",cur_button_shape)
+						 		.attr("stroke","red")
+						 		.attr("stroke-width",1);
+		}
+
+		button.datum(cur_data)//绑定数据以后，后面的function才能接到d，否则只能接到this
+					
+					.on("mouseover",mouseover_function)
+					.on("click",mouseclick_function)
+
+					.on("mouseout",function(){
+						if (typeof(mouseout_function)!="undefined")
+							mouseout_function(this);
+						tooltip.style("opacity",0.0);
+					})
+					.on("mousemove",function(){
+						// 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 
+						tooltip.style("left", (d3.event.pageX) + "px")
+							.style("top", (d3.event.pageY + 20) + "px");
+					})
+					.attr("class","rect_button")
+					.attr("id",cur_id)
+					
+					.attr("style",
+								"width:"+width+"px;"+
+								"height:"+height+"px;"+
+								"color:"+font_color+";"+
+								"font-size:"+font_size
+								)
+					.attr("transform",function(d,i){  
+				        return "translate(" + (biasx) + "," + (biasy) + ")";  
+				    }) 
+				    .attr("fill",function(d,i){  
+				        return background_color;  
+				    }) 
+
+				    
+					;
+
+
+	}
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
 	function draw_barcoded_tree(linear_tree,cur_tree_index)
 	{
+		
+/*
+		var triangle = d3.select("body")
+					    .append("div")
+					    .attr("id", "triangle")
+					    .style("position", "absolute")
+					    .style("z-index", "10")
+					    .style("opacity", 0);
+*/
+
 		xCompute = 0;//用于累积当前方块的横坐标
 		var acc_depth_node_num=[];//记录各个深度的结点数
 		for (var i=0;i<=4;++i){
@@ -349,6 +331,10 @@ var radial = function(){
 		console.log(linear_tree);
 		d3.select("#radial").selectAll("*").remove();
 		var svg = d3.select('#radial'); 
+
+
+		
+
 	/*
 		var tooltip = d3.select("body")
 					    .append("div")
@@ -366,7 +352,7 @@ var radial = function(){
 			if(d._father!=undefined){
 				fatherIndex = d._father.linear_index;
 			}
-			return 'bar-class num-' + d._depth + 'father-' + fatherIndex + " num-" + d._depth + ' father-' + fatherIndex;
+			return 'bar-class num-' + d._depth + ' father-' + fatherIndex;
 		})
 		.attr('id',function(d,i){
 			return  'bar-id' + d.linear_index;
@@ -392,7 +378,7 @@ var radial = function(){
 			if(d._father!=undefined){
 				fatherIndex = d._father.linear_index;
 			}
-			svg.selectAll('.num-' + d._depth + 'father-' + fatherIndex)
+			svg.selectAll('.num-' + d._depth + ' father-' + fatherIndex)
 				.classed("sibiling-highlight",true);
 			var fatherId = 0;
 			if(d._father!=undefined){
@@ -445,8 +431,67 @@ var radial = function(){
 
 		    svg.selectAll('path')
 		    	.classed('father-highlight',false);
+		})
+		.on('click',function(d,i){
+			var this_x=this.x.animVal.valueInSpecifiedUnits;
+			var this_y=this.y.animVal.valueInSpecifiedUnits;
+			var this_width=this.width.animVal.valueInSpecifiedUnits;
+			var this_height=this.height.animVal.valueInSpecifiedUnits;
+			console.log(this_x,this_y,this_width,this_height)
 
-		    ObserverManager.post("percentage", [0 ,d._depth]);
+			draw_adjust_button()
+		function draw_adjust_button()
+		{
+			var rect_attribute_button={
+				
+				height:50,
+				biasx:this_x+this_width/2,//400,
+				biasy:this_y+this_height,//200,
+				cur_id:"ratio_adjust",
+
+				button_shape: (	/*"M" + 0 + "," + 0 + 
+								"L" + 0 + ","+ 30 + 
+								"L" + 15 + ","+ 15 +
+								"L" + 0 + "," + 0 */
+								"M" + 0 + "," + 0 + 
+								"L" + -6 + ","+ 15 + 
+								"L" + 6 + ","+ 15 +
+								"L" + 0 + "," + 0)
+								,
+				background_color: "red",
+				cur_svg:svg,
+
+				mouseclick_function:function(d){
+					console.log("!!!")	
+				},
+			};			
+			creat_button(rect_attribute_button);
+		}
+
+			//function getX(obj){      
+    		//	return obj.offsetLeft + (obj.offsetParent ? getX(obj.offsetParent) : obj.x ? obj.x : 0);      
+			//}     
+			//function getY(obj){      
+			//    return (obj.offsetParent ? obj.offsetTop + getY(obj.offsetParent) : obj.y ? obj.y : 0);      
+			//}  
+			//var absx=getX(this);
+			//var absy=getY(this);
+
+			//console.log(this,absx,absy)
+			//console.log("click",this_x,this_y,this)
+			//console.log(d3.mouse( this ))
+			//console.log(d3.mouse( $("#radial")[0] ))
+			//console.log(d3.event.pageX,d3.event.pageY)
+
+			//triangle.style("left", (d3.event.pageX) + "px")
+			//				.style("top", (d3.event.pageY) + "px")
+			//				.style("opacity",1.0);
+			
+			//triangle.style("left", (/*d3.event.pageX*/d3.mouse( $("#radial")[0] )[0]) + "px")
+			//				.style("top", (/*d3.event.pageY + 20*/d3.mouse( $("#radial")[0] )[1]) + "px")
+			//				.style("opacity",1.0);
+
+
 		});
 		//--------------------------------------------------------------
 		var beginRadians = Math.PI/2,
