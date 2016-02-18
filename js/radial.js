@@ -369,14 +369,28 @@ var radial = function(){
 		console.log(linear_tree);
 		d3.select("#radial").selectAll("*").remove();
 		var svg = d3.select('#radial'); 
-	/*
-		var tooltip = d3.select("body")
-					    .append("div")
-					    .attr("class", "tooltip")
-					    .style("position", "absolute")
-					    .style("z-index", "10")
-					    .style("opacity", 0);
-	*/
+
+		//标记每个元素的tooltip在mouseout时是隐去还是保持
+		var maintain_tooltip_display=[];
+		for (var i=0;i<linear_tree.length;++i)
+		{
+			maintain_tooltip_display[i]=false;
+		}
+
+		var tip_array=[];
+		for (var i=0;i<linear_tree.length;++i)
+		{
+			tip_array[i]=d3.tip()
+				  .attr('class', 'd3-tip')
+				  .offset([-10, 0])
+				  .html(function(d) {
+				    return 	"<strong>name:</strong> <span style='color:red'>" + d.name  + "</span>"+ " " +
+				    		"<strong>flow size:</strong> <span style='color:red'>" + d.trees_values[cur_tree_index] + "</span>"+ " " +
+				    		"<strong>depth:</strong> <span style='color:red'>" + d._depth + "</span>";
+				  });
+			svg.call(tip_array[i]);
+		}
+
 		svg.selectAll('.bar')
 		.data(linear_tree)
 		.enter()
@@ -407,6 +421,8 @@ var radial = function(){
 		})
 		.attr('fill','black')
 		.on('mouseover',function(d,i){
+			tip_array[d.linear_index].show(d);
+
 			var fatherIndex = -1;
 			var thisIndex = d.linear_index;
 			if(d._father!=undefined){
@@ -445,6 +461,9 @@ var radial = function(){
 		    ObserverManager.post("percentage",[acc_depth_node_num[d._depth]/linear_tree.length , d._depth]);
 		})
 		.on('mouseout',function(d,i){
+			if (!maintain_tooltip_display[d.linear_index])
+				tip_array[d.linear_index].hide(d);
+
 			svg.selectAll('.bar-class')
 			.classed("sibiling-highlight",false);
 
@@ -469,6 +488,9 @@ var radial = function(){
 		    ObserverManager.post("percentage", [0 ,d._depth]);
 		})
 		.on('click',function(d,i){
+			//click一下转换hide或保持的状态
+			maintain_tooltip_display[d.linear_index]=!maintain_tooltip_display[d.linear_index];
+
 			var this_x=this.x.animVal.valueInSpecifiedUnits;
 			var this_y=this.y.animVal.valueInSpecifiedUnits;
 			var this_width=this.width.animVal.valueInSpecifiedUnits;
@@ -592,7 +614,7 @@ var radial = function(){
 				}
 			}
 		}
-	/*
+		/*
 		for (var i=0;i<=5;++i)
 		{
 			var text_x=100;
@@ -632,7 +654,7 @@ var radial = function(){
 						return d;
 					});
 		}
-	*/
+		*/
 	}
 	
 	$("#default").attr("checked",true);

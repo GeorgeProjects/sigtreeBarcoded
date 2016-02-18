@@ -65,18 +65,34 @@
 /*end of rect_button*/
 
 /*start of 提示框css*/
-  .tooltip{
-    font-family: simsun;
-    font-size: 14px;
-    width: 280;/*提示框宽度*/
-    height: auto;
-    position: absolute;
-    text-align: center;
-    border-style: solid; 
-    border-width: 1px;
-    background-color: white;
-    border-radius: 5px;
-  }
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
 /*end of 提示框css*/
   rect[class~=sibiling-highlight]{
     fill:lightblue;
