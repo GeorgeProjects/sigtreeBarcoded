@@ -15,7 +15,7 @@ var sliderSvg = d3.select("#slider-view")
 	.attr("height",sliderDivHeight);
 
 var radial = function(){
-	var widthArray = [24, 18, 12, 6, 2];
+	var widthArray = [24, 18, 12, 6, 2];//每一层的结点的宽度
 	var originArray = [];
 	for(var i = 0; i < widthArray.length; i++){
 		originArray[i] = widthArray[i];
@@ -150,25 +150,27 @@ var radial = function(){
 	
 	draw_barcoded_tree(linear_tree,1);
 
+	//只有当按下改变深度的按钮时，才会调用draw_barcoded_tree_depth
 	function draw_barcoded_tree_depth(linear_tree,cur_tree_index,depth){
 		console.log(depth);
-		xCompute = 0;
+		xCompute = 0;//用于累积当前方块的横坐标
 		var changeWidthArray = [];
 		for(var i = 0;i < widthArray.length;i++){
 			changeWidthArray[i] = 0;
 		}
 		for(var i = 0; i < widthArray.length; i++){
-			if(i <= depth){
+			if(i <= depth){//对于深度超过depth的结点，宽度赋为0
 				changeWidthArray[i] = widthArray[i];
 			}
 		}
 		svg.selectAll('rect')
 		.data(linear_tree)
-		.transition()
+		.transition()//过渡动画
+			//.duration(500)
 		.attr('x',function(d,i){
 			var backXCompute = xCompute;
 			if(changeWidthArray[d._depth]!=0){
-				xCompute = xCompute + changeWidthArray[d._depth] + 1;
+				xCompute = xCompute + changeWidthArray[d._depth] + 1;//两个节点之间空1px
 			}
 			return backXCompute;
 		})
@@ -181,6 +183,7 @@ var radial = function(){
 		.attr('height',function(d,i){
 			return rectHeight;
 		})
+		//call 相当于定义一个函数，再把选择的元素给它
 		.call(endall, function() { draw_link(); });
 		//--------------------------------------------------------------
 	}
@@ -233,7 +236,7 @@ var radial = function(){
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
 	function draw_barcoded_tree(linear_tree,cur_tree_index)
 	{
-		xCompute = 0;
+		xCompute = 0;//用于累积当前方块的横坐标
 		var acc_depth_node_num=[];//记录各个深度的结点数
 		for (var i=0;i<=4;++i){
 			acc_depth_node_num[i]=0;
@@ -246,12 +249,14 @@ var radial = function(){
 		console.log(linear_tree);
 		d3.select("#radial").selectAll("*").remove();
 		var svg = d3.select('#radial'); 
+	/*
 		var tooltip = d3.select("body")
 					    .append("div")
 					    .attr("class", "tooltip")
 					    .style("position", "absolute")
 					    .style("z-index", "10")
 					    .style("opacity", 0);
+	*/
 		svg.selectAll('.bar')
 		.data(linear_tree)
 		.enter()
@@ -268,7 +273,7 @@ var radial = function(){
 		})
 		.attr('x',function(d,i){
 			var backXCompute = xCompute;
-			xCompute = xCompute + widthArray[d._depth] + 1;
+			xCompute = xCompute + widthArray[d._depth] + 1;//两个节点之间空1px
 			return backXCompute;
 		})
 		.attr('y',function(d,i){
@@ -374,6 +379,7 @@ var radial = function(){
 				}
 			}
 		}
+	/*
 		for (var i=0;i<=5;++i)
 		{
 			var text_x=100;
@@ -387,7 +393,7 @@ var radial = function(){
 			//draw_text_description(str,text_x,text_y);
 		}
 		//给出text标注每个深度的结点分别有多少个
-		/*
+		
 		function draw_text_description(str,text_x,text_y)
 		{
 			var text = svg.append("text")
@@ -413,7 +419,7 @@ var radial = function(){
 						return d;
 					});
 		}
-		*/
+	*/
 	}
 	
 	$("#default").attr("checked",true);
