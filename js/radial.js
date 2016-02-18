@@ -296,7 +296,6 @@ var radial = function(){
 				if(currentDepth == depth){
 					draw_link();
 				}else{
-					alert("hhhhhhh");
 					draw_barcoded_tree_move(linear_tree,currentDepth,depth)
 				}
 			});
