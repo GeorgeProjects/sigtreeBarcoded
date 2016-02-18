@@ -1,6 +1,6 @@
 var shown_depth=4;
-var height = $("#leftTopWrapper").height();
-var width = $("#leftTopWrapper").width();
+var height = $("#radial-draw-svg").height();
+var width = $("#radial-draw-svg").width();
 var svg = d3.select("#radial-draw-svg")
 	.append("svg")
 	.attr("id","radial")
@@ -745,7 +745,7 @@ var radial = function(){
 			if(d._father!=undefined){
 				fatherIndex = d._father.linear_index;
 			}
-			return 'bar-class num-' + widthArray[d._depth] + 'father-' + fatherIndex;
+			return 'bar-class num-' + d._depth + 'father-' + fatherIndex;
 		})
 		.attr('id',function(d,i){
 			return  'bar-id' + d.linear_index;
@@ -765,13 +765,13 @@ var radial = function(){
 			return rectHeight;
 		})
 		.attr('fill','black')
-		.on('mousemove',function(d,i){
+		.on('mouseover',function(d,i){
 			var fatherIndex = -1;
 			var thisIndex = d.linear_index;
 			if(d._father!=undefined){
 				fatherIndex = d._father.linear_index;
 			}
-			svg.selectAll('.num-' + widthArray[d._depth] + 'father-' + fatherIndex)
+			svg.selectAll('.num-' + d._depth + 'father-' + fatherIndex)
 				.classed("sibiling-highlight",true);
 			var fatherId = 0;
 			if(d._father!=undefined){

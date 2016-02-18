@@ -44,55 +44,23 @@
   position: absolute;
   top:35px;
   /*top: 50px;*/
-  left: 0%;
-  right: 0%;
+  width:100%;
   bottom: 70%;
   border:1px solid #a0a0a0;
 }
 
-#rightWrapper {
-  border:1px solid #a0a0a0;
-  position: absolute;
-
-  /*start of change*/
-  /*
-  padding: 10px;
-  top: 30%;
-  left: 50%;
-  right: 0%;
-  bottom: 0%;
-  */
-  
-  height:0%;
-  width:0%;
-  
-  /*end of change*/
-
-}
-
 #tree-compare-depth-controller {
   position: absolute;
-  right: 8px;
+  right: 0px;
 }
 
 #leftTopWrapper {
   border:1px solid #a0a0a0;
   position: absolute;
   top: 30%;
-  left: 0%;
-
-  /*start of change*/
-  /*
-  right: 50%;
-  bottom: 30%;
-  */
-  
-  right: 0%;
+  left:0%;
+  right:1%;
   bottom: 0%;
-  
-  /*end of change*/
-
-  /*overflow-y:auto;*/
 }
 
 #radial-depth-controller {
@@ -109,14 +77,9 @@
   border:2px solid #a0a0a0;
   position: absolute;
   /*start of change*/
-  /*
   top: 70%;
-  left: 0%;
-  right: 50%;
+  
   bottom: 0%;
-  */  
-  width: 0%;
-  height:0%;
   /*end of change*/
 }
 
@@ -205,7 +168,7 @@ path[class~=focus-highlight], circle[class~=focus-highlight], rect[class~=focus-
   text-align: center;
 }
 #radial-draw-svg{
-  width:90%;
+  width:94%;
   height:100%;
 }
 #max-value{

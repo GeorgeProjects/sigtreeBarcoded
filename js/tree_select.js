@@ -4,7 +4,8 @@ var treeSelect = function(){
 	console.log("Listeners",ObserverManager.getListeners().length);
 	var svgWidth = $("#innerTopLeft").width();
 	var svgHeight = $("#innerTopLeft").height() * 19/20;
-	var compareArray = [0, 1];
+	var compareArray = [0,1];
+	var compareNum = 0;
 	var statData = dataCenter.stats;
 
 	var propotionArray_flowsize = [];
@@ -254,7 +255,6 @@ var treeSelect = function(){
 		var yAxisTicks = [];
 		yAxisTicks[0] = 0;
 
-
 		if (datadimMode=="flowsize")
 		{
 			for(var i = 1; ; i = i + 1){
@@ -309,12 +309,7 @@ var treeSelect = function(){
 			var yScale = d3.scale.linear()
 								.domain([0, Math.log(maxNum)])
 								.range([height, 0]);
-					
-
 		hisWidth = xScale(1) - 1;
-
-
-		
 		if (datadimMode=="nodenum")
 		{
 			for (var i=1;i<=9;++i)
@@ -345,21 +340,8 @@ var treeSelect = function(){
 			})
 			.attr("class", function(d, i) {
 				var className = "bar";
-				var selectIndex = compareArray.indexOf(d.index);
-				if(changeA){
-					if (selectIndex == 1){
-						className += " previous";
-					}
-					else if (selectIndex == 0){
-						className += " current";
-					}
-				}else{
-					if (selectIndex == 0){
-						className += " change-previous";
-					}
-					else if (selectIndex == 1){
-						className += " change-current";
-					}
+				if(d.index == compareNum){
+					className += " current";
 				}
 				return className;
 			})
@@ -399,8 +381,7 @@ var treeSelect = function(){
 						result = height - yScale(Math.log(d.L0Node)) + 1+bias;
 					else if (level==9)
 						result = height - yScale(Math.log(d.L0Node)) + bias;
-
-					
+	
 					if (result <= 0 )
 						console.log (result,level,height,yScale(Math.log(d.L0Node)));
 
@@ -452,18 +433,7 @@ var treeSelect = function(){
 			.on("mouseout",tip.hide)
 			.on('click',function(d,i){
 				var selectedID = +d.index;
-				if (compareArray.indexOf(selectedID) < 0){
-					//compareArray[0] = compareArray[1];
-					if(changeA){
-						compareArray[1] = selectedID; 
-					}else{
-						compareArray[0] = selectedID; 
-					}
-				} 
-				else {
-					var index = compareArray.indexOf(selectId);
-					compareArray.splice(index,1);
-				}
+				compareNum = selectedID;
 				changeComparedData();
 				d3.select("#append-rect").select("#percen-rect").remove();
 			});
@@ -509,29 +479,18 @@ var treeSelect = function(){
 			chart.selectAll(".current").classed("current", false);
 			chart.selectAll(".change-previous").classed("change-previous", false);
 			chart.selectAll(".change-current").classed("change-current", false);
-			if(changeA){
-				chart.selectAll("#his-" + compareArray[0]).classed("previous", true);
-				chart.selectAll("#his-" + compareArray[1]).classed("current", true);
-			}else{
-				chart.selectAll("#his-" + compareArray[0]).classed("change-previous", true);
-				chart.selectAll("#his-" + compareArray[1]).classed("change-current", true);
-			}
+			chart.selectAll("#his-" + compareNum).classed("current", true);
 			
 			chart.selectAll(".labelAB").remove();
 
-			for(var l = 0; l < compareArray.length; l++){
-				var id = compareArray[l];
-				var x = chart.selectAll("#his-" + id).attr("x");
-				var y = chart.selectAll("#his-" + id).attr("y") - 3;
-				chart
-					.append("text")
-					.attr("class","labelAB")
-					.attr("x", x)
-					.attr("y", y)
-					.text(function() {
-						return l == 0 ? "B" : "A";
-					});
-			}
+			var id = compareNum;
+			var x = chart.selectAll("#his-" + id).attr("x");
+			var y = chart.selectAll("#his-" + id).attr("y") - 3;
+			chart.append("text")
+				.attr("class","labelAB")
+				.attr("x", x)
+				.attr("y", y)
+				.text("A");
 
 			$("#innerTopRight #label-A .date_description").html(function() {
 				if (compareArray.length > 0) 
@@ -556,10 +515,9 @@ var treeSelect = function(){
 					return d3.format(".3s")(dataList[compareArray[0]].value) + "bytes";
 				return "";
 			});
+			compareArray[1] = compareNum;
 			ObserverManager.post("changeData", compareArray);
 		}
-
-
 	}
 
 	function changePercentage(percentage){
@@ -629,17 +587,7 @@ var treeSelect = function(){
 
 					d3.selectAll(".change-current" + ".level-"+cur_level)
 						.classed("change-current", false);//去掉原来的蓝色标记	
-				}
-			
-				
-
-
-				
-				
-
-				
-				
-				
+				}		
 			}
 	    }
 	    if (message == "show-detail-info") {

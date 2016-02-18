@@ -18,7 +18,6 @@
         <div class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <strong class="navbar-brand" style="height:30px">SignalTree Barcoded</strong>
-
                 <div class="navbar-collapse collapse">
                     <span class="nav navbar-nav navbar-right">
                         <li><a><strong>Peking University</strong></a></li>
@@ -26,15 +25,14 @@
                 </div>             
             </div>
         </div>
-
         <div id="topWrapper">
             <div id="innerTopLeft">
                 <div id="tree-select-controller">
                     <span class="datadim-btn btn btn-default btn-xs active" datadim-type="flowsize">
-                       <span class="glyphicon glyphicon-random"></span>
+                       <span class="glyphicon glyphicon-sort"></span>
                     </span>
                     <span class="datadim-btn btn btn-default btn-xs" datadim-type="nodenum">
-                       <span class="glyphicon glyphicon-record"></span>
+                       <span class="glyphicon glyphicon-th"></span>
                     </span>
                     
                     <span class="sort-btn btn btn-default btn-xs active" sort-type="time">
@@ -43,35 +41,14 @@
                     <span class="sort-btn btn btn-default btn-xs" sort-type="size">  
                         <span class="glyphicon glyphicon-signal"></span>
                     </span>
-                    <span class="data-btn btn btn-default btn-xs" data-type="switch">
-                       <span class="glyphicon glyphicon-refresh"></span>
-                    </span>
                 </div>
-
             </div>
             <div id="innerTopRight">
-                <!--<span class="sort-btn btn btn-default btn-xs">
-                    <span class="glyphicon glyphicon-info-sign glyphicon-white"></span>
-                </span>-->
-
                 <div id="scroll">
                     <div class="row">
-                        <div id="srocllDiv" class="col-md-6 text-center">
+                        <div id="srocllDiv" class="col-md-12 text-center">
                             <div id="label-A" class="label-wrapper">
                                 <span class="btn btn-default btn-xs label">A</span><br/>
-                                <span class="date_text"><strong>Date: </strong></span>
-                                <span class="date_description"></span><br/>
-                                <span class="value_text"><strong>Values: </strong></span>
-                                <span class="value_description"></span><br/>
-                                <span class="value_level"><strong>Level: </strong></span>
-                                <span class="level_description"></span><br/>
-                                <span class="value_node_num"><strong>Node Num:</strong></span>
-                                <span class="node_num_description"></span>
-                            </div>
-                        </div>
-                        <div id="scrollDiv2" class="col-md-6 text-center">
-                            <div id="label-B" class="label-wrapper">
-                                <span class="btn btn-default btn-xs label">B</span><br/>
                                 <span class="date_text"><strong>Date: </strong></span>
                                 <span class="date_description"></span><br/>
                                 <span class="value_text"><strong>Values: </strong></span>
@@ -85,7 +62,7 @@
                     </div>
                 </div>
                 
-                <div id="label-C" class="label-wrapper" style="text-align: center; width:100%">
+               <!-- <div id="label-C" class="label-wrapper" style="text-align: center; width:100%">
                     <span class="btn btn-default btn-xs label" id="node-type" class="backgrond-A">A</span>
                     <span id="node-id"><strong>Node: </strong></span>
                     <span id="node-description"></span>
@@ -97,40 +74,8 @@
                     <span id="tree-num-description"></span>
                     <span id="sum-node-num"><strong>sub-node Num:</strong></span>
                     <span id="sum-num-description"></span>
-                </div>
+                </div>-->
             </div>
-        </div>
-
-
-        <div id="rightWrapper">
-            <div>
-                <form id="tree-compare-depth-controller">
-                    <span class="btn btn-default btn-xs active level-btn" level=0>L0</span>
-                    <span class="btn btn-default btn-xs active level-btn" level=1>L1</span>
-                    <span class="btn btn-default btn-xs active level-btn" level=2>L2</span>
-                    <span class="btn btn-default btn-xs active level-btn" level=3>L3</span>
-                    <span class="btn btn-default btn-xs active level-btn" level=4>L4</span>
-                </form>
-            </div>
-            <div id="label-A"><span class="btn btn-default btn-xs label">A</span></div>
-            <table>
-                <tr>
-                    <td>
-                        <div id="treemap"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div id="test"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div id="test1"></div>
-                    </td>
-                </tr>
-            </table>
-            <div id="label-B"><span class="btn btn-default btn-xs label">B</span></div>
         </div>
 
         <div id="leftTopWrapper" class="row">
@@ -156,11 +101,6 @@
             <div id="radial-draw-svg" class="col-md-6">
             </div>
         </div>
-        <div id="leftBottomWrapper">
-            <!-- 去掉parset的svg -->
-            <!-- <svg class="parset"></svg> -->
-        </div>
-
     </body>
     <!-- Libraries -->
 
@@ -179,9 +119,7 @@
     <script type="text/javascript" src="js/combinator.js"> </script>
     <script type="text/javascript" src="libs/d3.parsets/d3.parsets.js"></script>    
 
-    <script type="text/javascript" src="js/tree_compare.js"></script>
 	<script type="text/javascript" src="js/radial.js"></script> 
-	<script type="text/javascript" src="js/parset.js"></script>    
 	<script type="text/javascript" src="js/tree_select.js"></script>
 
     <script type="text/javascript" src="js/main.js"></script>
