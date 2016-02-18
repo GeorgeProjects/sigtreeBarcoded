@@ -454,7 +454,9 @@ function cal_repeat_time(root)
 				}
 			}
 			var count_continuous_same_subtree=1;
-			for (var i=root_index+1;i<root_sibling_group.length;++i)
+
+			//for (var i=root_index+1;i<root_sibling_group.length;++i)
+			for (var i=root_index-1;i>=0;--i)
 			{
 				var cur_sibling=root_sibling_group[i];
 				var flag=tree_equality_compare(root,cur_sibling);
