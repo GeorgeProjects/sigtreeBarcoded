@@ -53,8 +53,6 @@ var mainController = function(){
                 file = "data/" + file;
                 defers.push(dataset.processor.loadData(file));
             }
-
-
             $.when(defers[0], defers[1])
                 .done(function() {
                     if (justChangeDataA == false) {
