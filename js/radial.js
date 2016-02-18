@@ -13,6 +13,7 @@ var sliderSvg = d3.select("#slider-view")
 	.attr("id","slider-svg")
 	.attr("width",sliderDivWidth)
 	.attr("height",sliderDivHeight);
+
 var radial = function(){
 	var widthArray = [24, 18, 12, 6, 2];
 	var originArray = [];
@@ -32,13 +33,8 @@ var radial = function(){
 
 	var dataProcessor = dataCenter.datasets[0].processor;
 	var dataset = dataCenter.datasets[0].processor.result;
-	var linear_tree=[];
 
-	//注意：JS中函数参数传递不是按引用传的
-	//函数内部如果直接给传入的对象赋值，效果是对内部的拷贝赋值；如果修改传入的对象的成员，那么修改能够影响到传入的对象
-
-	//用树结构存储公共树
-	var target_root={
+	var target_root={//用树结构存储公共树
 		//因为mark=0有特殊含义，所以输入的树的标号不能取0
 		mark:0,//mark为0表示这个结点至少在两棵树中出现，mark不为0时，用于标记这个结点出现过的那棵树
 		_depth:0,//结点所在的深度，在数据转换时d3的预处理函数已经用过depth了，所以这里要用_depth防止被覆盖
@@ -50,26 +46,26 @@ var radial = function(){
 		//如果用sunburst的layout，上层的size会自己算出来，否则需要手动算才有
 		_father: undefined
 	}
-	//用数组存储公共树
-	console.log(dataset.dataList)
+	var linear_tree=[];//用数组存储公共树
+
+	//注意：JS中函数参数传递不是按引用传的
+	//函数内部如果直接给传入的对象赋值，效果是对内部的拷贝赋值；如果修改传入的对象的成员，那么修改能够影响到传入的对象
+
 	merge_preprocess_rawdata(dataset.dataList,target_root,1);
-	draw_slide_bar();
-	function changePercentage(text){
-		text = +text;
-		var format_text = parseFloat(Math.round(text * 100) / 100).toFixed(2);
-		d3.select("#now-value")
-			.html(format_text);
-	}
-	function clearPercentage(){
-		d3.select("#now-value")
-			.html(null);
-	}
-	//把traverse和需要使用的局部静态变量包起来
-
 	linearlize(target_root,linear_tree);
-	draw_barcoded_tree(linear_tree,1,100);
 
+	draw_slide_bar();
 	function draw_slide_bar(){
+		function changePercentage(text){
+			text = +text;
+			var format_text = parseFloat(Math.round(text * 100) / 100).toFixed(2);
+			d3.select("#now-value")
+				.html(format_text);
+		}
+		function clearPercentage(){
+			d3.select("#now-value")
+				.html(null);
+		}
 		var min = 0;
 		var max = 30;
 		var sliderHeight = sliderDivHeight;
@@ -104,7 +100,7 @@ var radial = function(){
 	        	finalValue = finalValue > max ? max : finalValue;
 	        	finalValue = finalValue < min ? min : finalValue;
 	        	widthArray[i] = finalValue;
-	        	draw_barcoded_tree(linear_tree,1,100);
+	        	draw_barcoded_tree(linear_tree,1);
 	        	changePercentage(finalValue);
 	        });
 
@@ -146,6 +142,7 @@ var radial = function(){
 			.call(drag);
 	}
 	
+	draw_barcoded_tree(linear_tree,1);
 
 	function draw_barcoded_tree_depth(linear_tree,cur_tree_index,depth){
 		console.log(depth);
@@ -227,8 +224,8 @@ var radial = function(){
 		}
 	}
 	var g;
-	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index，要画的高度位置cur_biasy
-	function draw_barcoded_tree(linear_tree,cur_tree_index,cur_biasy)
+	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
+	function draw_barcoded_tree(linear_tree,cur_tree_index)
 	{
 		xCompute = 0;
 		var acc_depth_node_num=[];//记录各个深度的结点数
@@ -241,7 +238,6 @@ var radial = function(){
 			acc_depth_node_num[linear_tree[i]._depth]=acc_depth_node_num[linear_tree[i]._depth]+1;
 		}
 		console.log(linear_tree);
-		cur_biasy = 150;
 		d3.select("#radial").selectAll("*").remove();
 		var svg = d3.select('#radial'); 
 		var tooltip = d3.select("body")
@@ -385,6 +381,7 @@ var radial = function(){
 			//draw_text_description(str,text_x,text_y);
 		}
 		//给出text标注每个深度的结点分别有多少个
+		/*
 		function draw_text_description(str,text_x,text_y)
 		{
 			var text = svg.append("text")
@@ -410,59 +407,14 @@ var radial = function(){
 						return d;
 					});
 		}
+		*/
 	}
-	function creat_button(rect_attribute_button){
-		var width = rect_attribute_button.width;  //画布的宽度
-		var height = rect_attribute_button.height;   //画布的高度
-		var biasx=rect_attribute_button.biasx;
-		var biasy=rect_attribute_button.biasy;
-		var background_color=rect_attribute_button.background_color;
-		var mouseover_function=rect_attribute_button.mouseover_function;
-		var mouseout_function=rect_attribute_button.mouseout_function;
-		var mouseclick_function=rect_attribute_button.mouseclick_function;
-		var shown_string=rect_attribute_button.button_string;
-		var font_color=rect_attribute_button.font_color;
-		var font_size=rect_attribute_button.font_size;
-		var cur_id=rect_attribute_button.cur_id;
-		var cur_class=rect_attribute_button.cur_class;
-		var cur_data=rect_attribute_button.cur_data;
- 
- 		var tooltip=d3.selectAll("#tooltip");
-		g.append("rect")
-		.datum(cur_data)//绑定数据以后，后面的function才能接到d，否则只能接到this
-		.on("mouseover",mouseover_function)
-		.on("click",mouseclick_function)
-		.on("mouseout",function(){
-			mouseout_function(this);
-			tooltip.style("opacity",0.0);
-		})
-		.on("mousemove",function(){
-			// 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 
-			tooltip.style("left", (d3.event.pageX) + "px")
-				.style("top", (d3.event.pageY + 20) + "px");
-		})
-		.attr("class","rect_button")
-		.attr("id",cur_id)
-		.attr("style",
-					"width:"+width+"px;"+
-					"height:"+height+"px;"+
-					"color:"+font_color+";"+
-					"font-size:"+font_size
-					)
-		.attr("transform",function(d,i){  
-		       return "translate(" + (biasx) + "," + (biasy) + ")";  
-		   }) 
-		   .attr("fill",function(d,i){  
-		       return background_color;  
-		   });
-	}
+	
 	$("#default").attr("checked",true);
 	$("#radial-depth-controller").on("click", ".level-btn", function(){
-		// $("#radial-depth-controller .level-btn").removeClass("active");
 		var dep = $(this).attr("level");
 		shown_depth=dep;
 		$("#radial-depth-controller .level-btn").removeClass("active");		
-		
 		for (var i = 0; i <= dep; i++)
 			$("#radial-depth-controller .level-btn[level=" + i + "]").addClass("active");
 

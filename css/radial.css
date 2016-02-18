@@ -77,6 +77,7 @@
     background-color: white;
     border-radius: 5px;
   }
+/*end of 提示框css*/
   rect[class~=sibiling-highlight]{
     fill:lightblue;
   }
@@ -110,6 +111,6 @@
   .slider{
     fill:#2060d5;
   }
-/*end of 提示框css*/
+
 
 /*end of change*/

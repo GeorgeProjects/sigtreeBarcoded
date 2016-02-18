@@ -14,19 +14,15 @@
 				var flag_new_SPE=1;
 
 				var cur_SPE=data[i].atm;
-				//var cur_SPE=data[i]["SPE号"];
-
 				for (var j=0;j<cur_SPE_group.length;++j)//检查一遍当前已经创建出来的SPE层节点
 				{
 					if (cur_SPE_group[j].name==data[i].atm)//如果已经创建过了，那么就不是新的了
-					//if (cur_SPE_group[j].name==data[i]["SPE号"])//如果已经创建过了，那么就不是新的了
 					{
 						//如果是对其他树调用merge时创建过的SPE，那么这个SPE至少在两棵树里面出现过的	
 						if (cur_SPE_group[j].mark !=curtreeindex)
 						{
 							cur_SPE_group[j].mark=0;
 						}
-						
 						flag_new_SPE=0;
 						break;
 					}
@@ -55,9 +51,7 @@
 			if (data[i]["ATM数据"]=="有效数据")
 			{
 				var cur_SPE=data[i].atm;
-				//var cur_SPE=data[i]["SPE号"];
 				var cur_AAL=data[i].aal;//可能为AAL1/AAL2/AAL5
-				//var cur_AAL=data[i]["适配层/百分比例"].substr(0,4);//可能为AAL1/AAL2/AAL5
 				
 				//循环寻找当前的SPE在树中位置
 				for (var j=0;j<init_root.children.length;++j)
@@ -115,7 +109,6 @@
 					
 				//第三步检查VPI_VCI，创建VPI
 				var cur_VPI=data[i].vpi;
-				//var cur_VPI=data[i]["VPI/VCI"].substr(0,10);
 				var cur_VPI_group=cur_AAL_position.children;
 				//当前AAL的children数
 				var cur_VPI_group_length=cur_VPI_group.length;
@@ -164,7 +157,6 @@
 					
 				//第四步检查VPI_VCI，创建cid
 				var cur_CID=data[i].cid;
-				//var cur_CID=data[i]["VPI/VCI"].substr(19,2);
 
 				//需要检查是否是undefined，因为data数组中有的元素不存在cid分量
 				if (cur_CID=="" || typeof(cur_CID)=="undefined")//检查是否有cid
@@ -197,9 +189,6 @@
 							cur_CID_group[j].mark=0;
 
 							var cur_CID_numvalue=+data[i].flowSize;
-							//var cur_CID_numvalue=data[i]["比例"];
-							//cur_CID_numvalue=cur_CID_numvalue.substring(cur_CID_numvalue.indexOf('：')+1, cur_CID_numvalue.indexOf('字'));
-							//cur_CID_numvalue=+cur_CID_numvalue;
 
 							cur_CID_group[j].trees_values[curtreeindex]=cur_CID_numvalue;
 
@@ -223,9 +212,6 @@
 					var new_length_CID=cur_CID_group_length+1;
 
 					var cur_CID_numvalue=+data[i].flowSize;
-					//var cur_CID_numvalue=data[i]["比例"];
-					//cur_CID_numvalue=cur_CID_numvalue.substring(cur_CID_numvalue.indexOf('：')+1, cur_CID_numvalue.indexOf('字'));
-					//cur_CID_numvalue=+cur_CID_numvalue;
 						
 					cur_CID_group[new_length_CID-1]={
 						mark:curtreeindex,
@@ -246,10 +232,7 @@
 				}			
 			}
 		}
-			
 		aggregate_separate_tree_value(init_root);
-
-		
 	}
 
 
