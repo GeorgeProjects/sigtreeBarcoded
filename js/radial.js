@@ -32,82 +32,8 @@ var radial = function(){
 
 	var dataProcessor = dataCenter.datasets[0].processor;
 	var dataset = dataCenter.datasets[0].processor.result;
-
-	var min = 0;
-	var max = 30;
-	var sliderHeight = sliderDivHeight;
-	var sliderWidth = sliderDivWidth * 2 / 10;
 	var linear_tree=[];
 
-	sliderSvg.append("g")
-		.attr("id","slider-g")
-		.attr("transform","translate(" + sliderDivWidth * 4 / 10 + "," + 0 + ")");
-
-	var dragDis = 0;
-	var drag = d3.behavior.drag()
-        .on("drag", function(d,i) {
-        	var oy = originArray[i] / max * sliderHeight;
-            var dx = +d3.event.x;
-            var dy = +d3.event.y - oy;
-            if((d3.event.y > 0)&&(d3.event.y < sliderHeight - sliderHeight/50)){
-            	d3.select(this).attr("transform", function(d,i){
-	                return "translate(" + 0 + "," + dy + ")";
-	            });
-            }
-            dragDis = dy;
-            var value = dragDis / sliderDivHeight * max;
-        	var finalValue = originArray[i] + value;
-        	finalValue = finalValue > max ? max : finalValue;
-        	finalValue = finalValue < min ? min : finalValue;
-        	changePercentage(finalValue);
-        })
-        .on("dragend",function(d,i){
-        	console.log("dragEnd",dragDis);
-        	var value = dragDis / sliderDivHeight * max;
-        	var finalValue = originArray[i] + value;
-        	finalValue = finalValue > max ? max : finalValue;
-        	finalValue = finalValue < min ? min : finalValue;
-        	widthArray[i] = finalValue;
-        	draw_barcoded_tree(linear_tree,1,100);
-        	changePercentage(finalValue);
-        });
-
-    sliderSvg.select("#back-slider").remove();
-    sliderSvg.select("#slider-g")
-		.append("rect")
-		.attr("id","back-slider")
-		.attr("height",sliderHeight)
-		.attr("width",sliderWidth)
-		.attr("x",0)
-		.attr("y",0)
-		.attr("fill","gray");
-	sliderSvg.selectAll(".slider").remove();
-	sliderSvg.select("#slider-g")
-		.selectAll(".slider")
-		.data(widthArray)
-		.enter()
-		.append("rect")
-		.attr("class","slider")
-		.attr("id",function(d,i){
-			return "slider-" + i;
-		})
-		.attr("x",-sliderWidth/4)
-		.attr("y",function(d,i){
-			var value = +d;
-			return value / max * sliderHeight; 
-		})
-		.attr("width",sliderWidth + sliderWidth/2)
-		.attr("height",sliderHeight/50)
-		.on("mouseover",function(d,i){
-			d3.select(this).classed("slider-hover",true);
-			console.log("drag");
-			changePercentage(widthArray[i]);
-		})
-		.on("mouseout",function(d,i){
-			d3.select(this).classed("slider-hover",false);
-			clearPercentage();
-		})
-		.call(drag);
 	//注意：JS中函数参数传递不是按引用传的
 	//函数内部如果直接给传入的对象赋值，效果是对内部的拷贝赋值；如果修改传入的对象的成员，那么修改能够影响到传入的对象
 
@@ -126,7 +52,7 @@ var radial = function(){
 	}
 	//用数组存储公共树
 	merge_preprocess_rawdata(dataset.dataList,target_root,1);
-
+	draw_slide_bar();
 	function changePercentage(text){
 		text = +text;
 		var format_text = parseFloat(Math.round(text * 100) / 100).toFixed(2);
@@ -165,10 +91,84 @@ var radial = function(){
 		traverse(target_root,linear_tree);
 	}
 	linearlize(target_root,linear_tree);
-	cal_trees_colors(linear_tree,1);
-	console.log(target_root);
 	draw_barcoded_tree(linear_tree,1,100);
 
+	function draw_slide_bar(){
+		var min = 0;
+		var max = 30;
+		var sliderHeight = sliderDivHeight;
+		var sliderWidth = sliderDivWidth * 2 / 10;
+
+		sliderSvg.append("g")
+			.attr("id","slider-g")
+			.attr("transform","translate(" + sliderDivWidth * 4 / 10 + "," + 0 + ")");
+
+		var dragDis = 0;
+		var drag = d3.behavior.drag()
+	        .on("drag", function(d,i) {
+	        	var oy = originArray[i] / max * sliderHeight;
+	            var dx = +d3.event.x;
+	            var dy = +d3.event.y - oy;
+	            if((d3.event.y > 0)&&(d3.event.y < sliderHeight - sliderHeight/50)){
+	            	d3.select(this).attr("transform", function(d,i){
+		                return "translate(" + 0 + "," + dy + ")";
+		            });
+	            }
+	            dragDis = dy;
+	            var value = dragDis / sliderDivHeight * max;
+	        	var finalValue = originArray[i] + value;
+	        	finalValue = finalValue > max ? max : finalValue;
+	        	finalValue = finalValue < min ? min : finalValue;
+	        	changePercentage(finalValue);
+	        })
+	        .on("dragend",function(d,i){
+	        	console.log("dragEnd",dragDis);
+	        	var value = dragDis / sliderDivHeight * max;
+	        	var finalValue = originArray[i] + value;
+	        	finalValue = finalValue > max ? max : finalValue;
+	        	finalValue = finalValue < min ? min : finalValue;
+	        	widthArray[i] = finalValue;
+	        	draw_barcoded_tree(linear_tree,1,100);
+	        	changePercentage(finalValue);
+	        });
+
+	    sliderSvg.select("#back-slider").remove();
+	    sliderSvg.select("#slider-g")
+			.append("rect")
+			.attr("id","back-slider")
+			.attr("height",sliderHeight)
+			.attr("width",sliderWidth)
+			.attr("x",0)
+			.attr("y",0)
+			.attr("fill","gray");
+		sliderSvg.selectAll(".slider").remove();
+		sliderSvg.select("#slider-g")
+			.selectAll(".slider")
+			.data(widthArray)
+			.enter()
+			.append("rect")
+			.attr("class","slider")
+			.attr("id",function(d,i){
+				return "slider-" + i;
+			})
+			.attr("x",-sliderWidth/4)
+			.attr("y",function(d,i){
+				var value = +d;
+				return value / max * sliderHeight; 
+			})
+			.attr("width",sliderWidth + sliderWidth/2)
+			.attr("height",sliderHeight/50)
+			.on("mouseover",function(d,i){
+				d3.select(this).classed("slider-hover",true);
+				console.log("drag");
+				changePercentage(widthArray[i]);
+			})
+			.on("mouseout",function(d,i){
+				d3.select(this).classed("slider-hover",false);
+				clearPercentage();
+			})
+			.call(drag);
+	}
 	//将data合并到init_root中
 	//如果init_root不是空树，merge的过程就是在做两棵树的合并
 	//curtreeindex表示当前合并的树的编号
@@ -553,79 +553,6 @@ var radial = function(){
 		}
 		
 	}
-
-	//输入线性化以后的树，以及需要计算所有节点对应颜色的那棵树的编号后，计算所有节点的颜色
-	function cal_trees_colors(linear_tree,cur_tree_index)
-	{
-		//结点的亮度映射
-		//用于给不存在的结点赋的，能使得这个结点看不见的，最最高的亮度
-		var luminance_max=0;
-		var luminance = d3.scale.sqrt()//linear()//.sqrt()//配色的亮度
-						    .domain([0, 1])//定义域
-						    .clamp(true)
-						    .range([luminance_max, 0]);//值域
-
-
-		for (var i=0;i<linear_tree.length;++i)//对于线性化的并集树中每个元素循环
-		{
-			var cur_element=linear_tree[i];
-
-			//如果原来这棵树没有这个结点，那么补出一个none
-			if (typeof(cur_element.trees_values[cur_tree_index])=="undefined")
-			{
-				cur_element.trees_values[cur_tree_index]="none";
-			}
-			
-			var cur_element_value=cur_element.trees_values[cur_tree_index];
-			if (cur_element_value=="none")//none对应数值0
-				cur_element_value=0;
-			
-
-			//计算在cur_tree_index对应的树中，当前结点应有的亮度
-			if (cur_element._depth==0)//对于根节点，直接赋予luminance(1)
-			{
-				var cur_color_lum=luminance(1);
-			}
-			else//非根节点
-			{
-				//如果原来这棵树没有这个结点的父节点（即这个结点和其父都不在这棵树出现），那么补出一个none
-				if (typeof(cur_element._father.trees_values[cur_tree_index])=="undefined")
-				{
-					cur_element._father.trees_values[cur_tree_index]="none";
-				}
-
-				var cur_element_father_value=cur_element._father.trees_values[cur_tree_index];
-				if (cur_element_father_value=="none")//none对应数值0
-					cur_element_father_value=0;
-
-				//用一个结点的数值除以其父的数值来决定其亮度，由此能够比较一个结点与其兄弟之间的数值
-				//相对数值越大的结点，传入luminance的值越大，映射出的值越小，画出来的颜色越深
-				//当相对数值趋向0时，结点变为无色
-				if (cur_element_father_value!=0)
-					var cur_color_lum=luminance(cur_element_value/cur_element_father_value);
-				else
-					var cur_color_lum=luminance_max;//如果father_value等于0，意味着这个点的父不在这棵树中出现，这个点本身也不在这棵树出现，那么这样的点应该为无色，所以赋最高的luminance
-
-				//console.log(cur_element_value,cur_element_father_value,cur_color_lum)
-			}
-
-
-			//基础颜色是steelblue
-			var cur_index_default_color="black";
-			var cur_element_cur_index_default_color=d3.lab(cur_index_default_color)
-
-			//console.log(cur_color_lum)
-			cur_element_cur_index_default_color.l=cur_color_lum;
-
-			if (typeof(cur_element.trees_default_colors)=="undefined")//原来没有开过数组的话要撑开来
-			{
-				cur_element.trees_default_colors=[];
-			}
-			//记录当前元素的默认color
-			cur_element.trees_default_colors[cur_tree_index]=cur_element_cur_index_default_color;
-		}
-	}
-
 
 	//判断一个数字或者字符串里面有没有数字以外的值
 	function isInt(str){
