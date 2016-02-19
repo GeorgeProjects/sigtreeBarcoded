@@ -469,8 +469,25 @@ var treeSelect = function(){
 				tip.hide(d);
 			})
 			.on('click',function(d,i){
+				/*
+				var selectedID = +d.index;*/
+				
 				var selectedID = +d.index;
+				if (compareArray.indexOf(selectedID) < 0){
+					//compareArray[0] = compareArray[1];
+					if(changeA){
+						compareArray[1] = selectedID; 
+					}else{
+						compareArray[0] = selectedID; 
+					}
+				} 
+				else {
+					var index = compareArray.indexOf(selectId);
+					compareArray.splice(index,1);
+				}
+
 				compareNum = selectedID;
+				
 				changeComparedData();
 				d3.select("#append-rect").select("#percen-rect").remove();
 			});
