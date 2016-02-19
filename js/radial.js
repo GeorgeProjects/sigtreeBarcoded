@@ -171,10 +171,17 @@ var radial = function(){
 
 	if($("#state-change").hasClass("active")){
 		draw_reduce_barcoded_tree(linear_tree,1);
+		if(shown_depth!=4 && shown_depth!=undefined){
+			draw_reduce_barcoded_depth(linear_tree,4,shown_depth);
+			formerDepth = shown_depth;
+		}
 	}else{
 		draw_barcoded_tree(linear_tree,1);
+		if(shown_depth!=4 && shown_depth!=undefined){
+			draw_barcoded_tree_depth(linear_tree,4,shown_depth);
+			formerDepth = shown_depth;
+		}
 	}
-
 	function draw_barcoded_tree_depth(linear_tree,former_depth,depth){
 		//按下换depth的button时，要把原来的tip全都删光
 		for (var i=0;i<linear_tree.length;++i)
@@ -994,6 +1001,7 @@ var radial = function(){
 			var this_height=this.height.animVal.valueInSpecifiedUnits;
 			draw_adjust_button();
 		});
+		draw_link();
 	}
 	//---------------------------------------------------------------------------
 	//---------------------------------------------------------------------------
@@ -1368,24 +1376,20 @@ var radial = function(){
 	$("#state-change").unbind().click(function(){
 		if($("#state-change").hasClass("active")){
 			shown_depth == 0?formerDepth=4:formerDepth=0;
-			console.log("formerDepth:"+formerDepth);
-			console.log("shown_depth:"+shown_depth);
 			draw_barcoded_tree(linear_tree,1);
-			if(formerDepth < shown_depth){
-				draw_reduce_barcoded_move(linear_tree,formerDepth,shown_depth);
-			}else if(formerDepth > shown_depth){
-				draw_reduce_barcoded_depth(linear_tree,formerDepth,shown_depth);
-			}
-			$("#state-change").removeClass("active");
-		}else{
-			shown_depth == 0?formerDepth=4:formerDepth=0;
-			console.log("formerDepth:"+formerDepth);
-			console.log("shown_depth:"+shown_depth);
-			draw_reduce_barcoded_tree(linear_tree,1);
 			if(formerDepth < shown_depth){
 				draw_barcoded_tree_move(linear_tree,formerDepth,shown_depth);
 			}else if(formerDepth > shown_depth){
 				draw_barcoded_tree_depth(linear_tree,formerDepth,shown_depth);
+			}
+			$("#state-change").removeClass("active");
+		}else{
+			shown_depth == 0?formerDepth=4:formerDepth=0;
+			draw_reduce_barcoded_tree(linear_tree,1);
+			if(formerDepth < shown_depth){
+				draw_reduce_barcoded_move(linear_tree,formerDepth,shown_depth);
+			}else if(formerDepth > shown_depth){
+				draw_reduce_barcoded_depth(linear_tree,formerDepth,shown_depth);
 			}
 			$("#state-change").addClass("active");
 		}
