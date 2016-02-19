@@ -425,6 +425,7 @@ function reorder_tree(root)
 
 
 
+
 //传入root以后，对于每个结点，标记这个结点与他的所有兄弟组成的结点组中
 //按照下标来看，在他的下标之后包括他本身，有多少个连续的子树结构相同的兄弟结点
 function cal_repeat_time(root)
@@ -432,18 +433,23 @@ function cal_repeat_time(root)
 	cal_repeat_time_traverse(root);
 	function cal_repeat_time_traverse(root)
 	{
+		//标记当前的子树是其父下的第n种不同的子树
+		//var acc_nth_different_subtree=1;
+
 		if (typeof(root)=="undefined")
 			return;
 
 		if (typeof(root._father)=="undefined")
 		{
 			root.continuous_repeat_time=1;
+
+			//root.nth_different_subtree=acc_nth_different_subtree;
 		}
 		else
 		{
 			var root_sibling_group=root._father.children;
 			var root_route=root.route;
-			var root_index=0;
+			var root_index=0;//记录当前的root在其父的孩子数组中的下标
 			for (var i=0;i<root_sibling_group.length;++i)
 			{
 				var cur_sibling=root_sibling_group[i];
@@ -455,24 +461,35 @@ function cal_repeat_time(root)
 			}
 			var count_continuous_same_subtree=1;
 
-			//for (var i=root_index+1;i<root_sibling_group.length;++i)
+			//var flag_exist_equal_former_sibling=0;
 			for (var i=root_index-1;i>=0;--i)
 			{
 				var cur_sibling=root_sibling_group[i];
-				var flag=tree_equality_compare(root,cur_sibling);
-				if (flag==1)
+				var is_equal=tree_equality_compare(root,cur_sibling);
+				if (is_equal)//如果相等
+				{
 					count_continuous_same_subtree=count_continuous_same_subtree+1;
+					//flag_exist_equal_former_sibling=1;
+				}
 				else
 					break;
 			}
 			root.continuous_repeat_time=count_continuous_same_subtree;
+
+			//if (!flag_exist_equal_former_sibling)
+			//{
+			//	acc_nth_different_subtree=acc_nth_different_subtree+1;
+			//}
+			//root.nth_different_subtree=acc_nth_different_subtree;
+
 		}
 
+
+		//对每个子递归计算
 		var cur_children_group=root.children;
 		if (typeof(root.children)=="undefined")
 			return;
 		var cur_children_group_size=cur_children_group.length;
-		//对每个子递归计算
 		for (var i=0;i<cur_children_group_size;++i)
 		{
 			cal_repeat_time_traverse(root.children[i]);
@@ -502,6 +519,54 @@ function cal_repeat_time(root)
 			}
 		}
 		return 0;
+	}
+}
+
+//利用cal_repeat_time得到的结果
+//传入root以后，对于包括root的这个子树的每个结点，以及root的所有兄弟结点（但不包括兄弟结点的子孙节点）
+//标记这个结点与他的所有兄弟组成的结点群中
+//按照下标来看，将连续的拥有相同的结构的兄弟归为同一组时，每个结点所处的局部的组号
+function cal_nth_different_subtree_traverse(root)
+{
+	cal_nth_different_subtree_traverse(root);
+	//传入root以后，对于包括不root的这个子树的每个结点（从root的孩子开始看），
+	//标记这个结点与他的所有兄弟组成的结点群中按照下标来看，
+	//将连续的拥有相同的结构的兄弟归为同一组时，每个结点所处的局部的组号
+	function cal_nth_different_subtree_traverse(root)
+	{
+		if (typeof(root)=="undefined")
+			return;
+		if (typeof(root._father)=="undefined")
+		{
+			//如果root没有father，那么他就没有兄弟，那么他的就是唯一的一组，是第一组
+			root.nth_different_subtree=1;
+		}
+		else
+		{
+			var acc_nth_different_subtree=0;
+
+			var root_sibling_group=root._father.children;
+
+			for (var i=0;i<root_sibling_group.length;++i)
+			{
+				var cur_node=root_sibling_group[i];
+				if (cur_node.continuous_repeat_time==1)
+				{
+					acc_nth_different_subtree=acc_nth_different_subtree+1;
+				}
+				cur_node.nth_different_subtree=acc_nth_different_subtree;
+			}
+		}
+
+		var cur_children_group=root.children;
+		if (typeof(root.children)=="undefined")
+			return;
+		var cur_children_group_size=cur_children_group.length;
+		//对每个子递归计算
+		for (var i=0;i<cur_children_group_size;++i)
+		{
+			cal_nth_different_subtree_traverse(root.children[i]);
+		}
 	}
 }
 
