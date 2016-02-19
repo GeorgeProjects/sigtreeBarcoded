@@ -33,6 +33,7 @@ var radial = function(){
 	var xCompute = 0;
 	var Radial = {};
 	ObserverManager.addListener(Radial);
+
 	var handleColor = ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9"];
 	var dataProcessor = dataCenter.datasets[0].processor;
 	var dataset = dataCenter.datasets[0].processor.result;
@@ -688,6 +689,17 @@ var radial = function(){
 	});
 
     Radial.OMListen = function(message, data) {
+    	if (message == "treeselectsend_radialreceive_highlight"){
+    		var cur_highlight_depth=data;
+    		var changeClass = "hover-depth-" + cur_highlight_depth;
+    		d3.selectAll(".num-" + cur_highlight_depth).classed(changeClass,true);
+    	}
+    	if (message == "treeselectsend_radialreceive_disable_highlight"){
+    		var cur_highlight_depth=data;
+    		var changeClass = "hover-depth-" + cur_highlight_depth;
+    		d3.selectAll(".num-" + cur_highlight_depth).classed(changeClass,false);
+    	}
+    	/*
 		var idPrefix = "#radial-node-";
 		if (message == "highlight") {
 			svg.selectAll(".highlight").classed("highlight", false)
@@ -720,6 +732,7 @@ var radial = function(){
         if(message == "depth"){
         	draw_depth(data);
         }	
+        */
     }
     return Radial;
 }
