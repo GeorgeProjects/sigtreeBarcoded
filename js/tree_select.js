@@ -115,7 +115,6 @@ var treeSelect = function(){
 	//处理好四个数组
 	function processStatData() {
 		process_timeSortArray_flowsize();
-		console.log(statData);
 		function process_timeSortArray_flowsize()
 		{
 			for (var i = 0; i < statData.length; i++) {
@@ -247,8 +246,8 @@ var treeSelect = function(){
 		else if (datadimMode=="nodenum")
 		{
 			for(var i = 1; ; i = i + 1){
-				yAxisTicks[i] = yAxisTicks[i-1] + 2/*100*/;//每隔2标一下
-				if(yAxisTicks[i] > yAxisMax - 2/*100*/){
+				yAxisTicks[i] = yAxisTicks[i-1] + 2;//每隔2标一下
+				if(yAxisTicks[i] > yAxisMax - 2){
 					break;
 				}
 			}
@@ -292,22 +291,24 @@ var treeSelect = function(){
 		hisWidth = xScale(1) - 1;
 		if (datadimMode=="nodenum")
 		{
+			//堆9层histogram来达到出现4个白条的效果
 			for (var i=1;i<=9;++i)
 			{
-				pile_bars(i);
+				pile_bars(i,datadimMode);
 			}
 		}
 		else if (datadimMode=="flowsize")
 		{
-			pile_bars(1);
+			pile_bars(1,datadimMode);
 		}
+		
 		
 		function pile_bars(level)
 		{
 
 			var bias=2;//为了避免L0结点显示不出来而加的bias
 
-			chart.selectAll(/*".bar"*/".bar"+" level-"+level)
+			chart.selectAll(".bar"+" level-"+level)
 	 		.data(dataArray)
 	 		.enter()
 	 		.append("rect")
@@ -410,10 +411,45 @@ var treeSelect = function(){
 			.classed(("level-"+level),true)
 
 			.on("mouseover",function(d,i){
-				console.log(d,this)
+
+				//nodenum模式下，mouseover一段柱子时，高亮barcode中所有对应深度的结点
+				if (datadimMode=="nodenum")
+				{
+					var cur_html_element_class=this.className.animVal;
+					//记录当前元素是否是被单击选中过的current元素，是的话为1,否则为0
+					var flag_current = ( cur_html_element_class.indexOf("current") !=-1);
+					if (flag_current)
+					{
+						var cur_level = cur_html_element_class[cur_html_element_class.indexOf("level-")+"level-".length];
+						var cur_depth = 4 - (cur_level-1)/2;
+						//记录cur_depth是不是整数，如果不是整数，说明当前mouseover的是夹层的白条
+						var is_integer = (parseInt(cur_depth)==cur_depth);
+						if (is_integer)
+							ObserverManager.post("treeselectsend_radialreceive_highlight",cur_depth);
+					}
+				}
+
 				tip.show(d);
 			})
 			.on("mouseout",function(d,i){
+
+				//nodenum模式下，mouseout一段柱子时，取消高亮barcode中所有对应深度的结点
+				if (datadimMode=="nodenum")
+				{
+					var cur_html_element_class=this.className.animVal;
+					//记录当前元素是否是被单击选中过的current元素，是的话为1,否则为0
+					var flag_current = ( cur_html_element_class.indexOf("current") !=-1);
+					if (flag_current)
+					{
+						var cur_level = cur_html_element_class[cur_html_element_class.indexOf("level-")+"level-".length];
+						var cur_depth = 4 - (cur_level-1)/2;
+						//记录cur_depth是不是整数，如果不是整数，说明当前mouseout的是夹层的白条
+						var is_integer = (parseInt(cur_depth)==cur_depth);
+						if (is_integer)
+							ObserverManager.post("treeselectsend_radialreceive_disable_highlight",cur_depth);
+					}
+				}
+
 				tip.hide(d);
 			})
 			.on('click',function(d,i){
