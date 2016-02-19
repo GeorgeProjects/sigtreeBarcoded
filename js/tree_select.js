@@ -15,6 +15,8 @@ var treeSelect = function(){
 
 	var dataList = timeSortArray_flowsize;
 
+
+
 	var sortMode = "time";
 	var datadimMode = "flowsize";
 
@@ -509,30 +511,37 @@ var treeSelect = function(){
 				.attr("y", y)
 				.text("A");
 
+			console.log(compareArray,dataList,dataList[compareArray[1]].time.split("-")[0]);
 			$("#innerTopRight #label-A .date_description").html(function() {
 				if (compareArray.length > 0) 
+				{
 					var timeArray = dataList[compareArray[1]].time.split("-");
 					return timeArray[0];
+				}
 				return "";
 			});
 			$("#innerTopRight #label-A .value_description").text(function() {
 				if (compareArray.length > 0)  
+				{
 					return  d3.format(".3s")(dataList[compareArray[1]].value) + "bytes" ;
+				}
 				return "";
 			});
 			$("#innerTopRight #label-A .level_description").text(function() {
 				if (compareArray.length > 0)
+				{
 					var levelDescription = 4;
 					return  levelDescription;
+				}
 				return "";
 			});
 			$("#innerTopRight #label-A .node_num_description").text(function() {
 				if (compareArray.length > 0)
-					console.log(dataList[compareArray[1]]);
-					console.log(dataList);
+				{
 					var nodeNumDescription = dataList[compareArray[1]].sumNode;
 					console.log("nodeNumDescription:"+nodeNumDescription);
 					return nodeNumDescription;
+				}
 				return "";
 			});
 			compareArray[1] = compareNum;
