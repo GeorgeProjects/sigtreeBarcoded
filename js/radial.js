@@ -25,9 +25,6 @@ var radial = function(){
 	}
 	var topHeight = height * 0.446;
 	var bottomHeight = topHeight + sliderDivHeight;
-	console.log("height:" + topHeight);
-	console.log("bottomHeight:" + bottomHeight);
-	console.log("sliderHeight:" + sliderDivHeight);
 	var rectHeight = 60;
 	var rectY = 10;
 	var xCompute = 0;
@@ -61,7 +58,7 @@ var radial = function(){
 	cal_repeat_time(target_root);
 
 	linearlize(target_root,linear_tree);
-
+	console.log("target_root");
 	console.log(target_root);
 
 	draw_slide_bar();
@@ -368,10 +365,21 @@ var radial = function(){
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
 	function draw_barcoded_tree(linear_tree,cur_tree_index)
 	{
-		//在histogram换数据时，要保证原来的tip全都消掉
-		for (var i=0;i<tip_array.length;++i)
-			tip_array[i].hide();//hide可以不传参数
-
+		for (var i=0;i<tip_array.length;++i){
+			tip_array[i].hide();
+		}
+		var rowNum = 7;
+		var divideNum = rowNum * 3 - 1;
+		var barHeight = rectHeight / divideNum * 2;
+		var barGap = rectHeight/divideNum;
+		var barWidth = 10;
+		var curDrawDep = 10;
+		var formerNodeRepeat = 0;
+		var formerDepth = 0;
+		for(var i=0;i<linear_tree.length;i++){
+			console.log(linear_tree[i].continuous_repeat_time);
+		}
+		console.log(linear_tree);
 		xCompute = 0;//用于累积当前方块的横坐标
 		var acc_depth_node_num=[];//记录各个深度的结点数
 		for (var i=0;i<=4;++i){
@@ -382,7 +390,6 @@ var radial = function(){
 		{
 			acc_depth_node_num[linear_tree[i]._depth]=acc_depth_node_num[linear_tree[i]._depth]+1;
 		}
-		console.log(linear_tree);
 		d3.select("#radial").selectAll("*").remove();
 		var svg = d3.select('#radial'); 
 
@@ -422,17 +429,77 @@ var radial = function(){
 			return  'bar-id' + d.linear_index;
 		})
 		.attr('x',function(d,i){
+			var repeatTime = +d.continuous_repeat_time;
+			if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+				curDrawDep = +d._depth;
+			}
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
+				curDrawDep = 10;
+				if((formerNodeRepeat - 1)%rowNum != 0){
+					xCompute = xCompute + widthArray[d._depth] + 1;
+				}
+			}
+			if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+				xCompute = xCompute + widthArray[d._depth] + 1;
+			}
 			var backXCompute = xCompute;
-			xCompute = xCompute + widthArray[d._depth] + 1;//两个节点之间空1px
+			if(d._depth < curDrawDep){
+				xCompute = xCompute + widthArray[d._depth] + 1;//两个节点之间空1px
+			}else if(d._depth == curDrawDep){
+				if((repeatTime - 1)%rowNum == 0){
+					xCompute = xCompute + widthArray[d._depth] + 1;
+				}
+			}
+			if(d.continuous_repeat_time != 1 && d._depth <= curDrawDep){
+				formerNodeRepeat = d.continuous_repeat_time;
+				formerDepth = d._depth;
+			}
 			return backXCompute;
 		})
 		.attr('y',function(d,i){
+			var repeatTime = +d.continuous_repeat_time;
+			if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+				curDrawDep = +d._depth;
+			}
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+				curDrawDep = 10;
+			}
+			if(d._depth == curDrawDep){
+				return rectY + (repeatTime - 2) % rowNum * (barGap + barHeight);
+			}
 			return rectY;
 		})
 		.attr('width',function(d,i){
-			return widthArray[d._depth];
+			if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+				curDrawDep = +d._depth;
+			}
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+				curDrawDep = 10;
+			}
+			var hisWidth = 0;
+			var d_depth = +d._depth;
+			if(d._depth < curDrawDep){
+				hisWidth = widthArray[d._depth];
+			}else if(d._depth == curDrawDep){
+				hisWidth = widthArray[d._depth];
+				//hisWidth = barWidth;
+			}else if(d._depth > curDrawDep){
+				hisWidth = 0;
+			}
+			return hisWidth;
 		})
 		.attr('height',function(d,i){
+			if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+				curDrawDep = +d._depth;
+			}
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+				curDrawDep = 10;
+			}
+			var hisWidth = 0;
+			var d_depth = +d._depth;
+			if(d._depth == curDrawDep){
+				return barHeight;
+			}
 			return rectHeight;
 		})
 		.attr('fill','black')
