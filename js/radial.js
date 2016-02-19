@@ -166,7 +166,11 @@ var radial = function(){
 	
 	var maintain_tooltip_display=[];
 
-	draw_barcoded_tree(linear_tree,1);
+	if($("#state-change").hasClass("active")){
+		draw_reduce_barcoded_tree(linear_tree,1);
+	}else{
+		draw_barcoded_tree(linear_tree,1);
+	}
 
 	function draw_barcoded_tree_depth(linear_tree,former_depth,depth){
 		//按下换depth的button时，要把原来的tip全都删光
@@ -780,8 +784,7 @@ var radial = function(){
 			}
 		}
 	}
-	
-		function draw_adjust_button()
+	function draw_adjust_button()
 		{
 			var rect_attribute_button={
 				
@@ -863,8 +866,9 @@ var radial = function(){
 						return background_color;  
 					});
 		}
+
 	$("#default").attr("checked",true);
-	$("#radial-depth-controller").on("click", ".level-btn", function(){
+	$("#radial-depth-controller").unbind().on("click", ".level-btn", function(){
 		var dep = $(this).attr("level");
 		shown_depth=dep;
 		$("#radial-depth-controller .level-btn").removeClass("active");		
@@ -877,14 +881,13 @@ var radial = function(){
 		}
 		formerDepth = dep;
 	});
-	$("#radial-depth-controller").on("click",".change-btn",function(){
+	$("#state-change").unbind().click(function(){
 		if($("#state-change").hasClass("active")){
-			$("#state-change").removeClass("active");
 			draw_barcoded_tree(linear_tree,1);
+			$("#state-change").removeClass("active");
 		}else{
+			draw_reduce_barcoded_tree(linear_tree,1);
 			$("#state-change").addClass("active");
-			var curtreeindex=1;
-			draw_reduce_barcoded_tree(linear_tree,curtreeindex);
 		}
 	});
     Radial.OMListen = function(message, data) {
@@ -898,40 +901,6 @@ var radial = function(){
     		var changeClass = "hover-depth-" + cur_highlight_depth;
     		d3.selectAll(".num-" + cur_highlight_depth).classed(changeClass,false);
     	}
-    	/*
-		var idPrefix = "#radial-node-";
-		if (message == "highlight") {
-			svg.selectAll(".highlight").classed("highlight", false)
-			svg.selectAll(".half-highlight").classed("half-highlight", false)
-			for (var i = 0; i < data.length; i++) {
-				svg.select(idPrefix + data[i]).classed("highlight", true);
-				svg.select(idPrefix + data[i]).each(function(d) {
-					if (d == null) return;
-					var node = d.parent;
-					while (node != null) {
-						svg.select(idPrefix + node.id).classed("half-highlight", true);
-						node = node.parent;
-					}
-				})				
-			}
-		}
-        if(message == "mouse-over"){
-        	for (var i = 0; i < data.length; i++) {
-				svg.select(idPrefix + data[i]).classed("focus-highlight", true);
-				if (svg.select(idPrefix + data[i]).data().length > 0) {
-					var nodeData = svg.select(idPrefix + data[i]).data()[0];
-				}
-			}
-        }
-        if(message == "mouse-out"){
-        	for (var i = 0; i < data.length; i++) {
-				svg.select(idPrefix + data[i]).classed("focus-highlight", false);
-			}
-        }
-        if(message == "depth"){
-        	draw_depth(data);
-        }	
-        */
     }
     return Radial;
 }

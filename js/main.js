@@ -62,18 +62,11 @@ var mainController = function(){
 
                         var listeners = _.without(ObserverManager.getListeners(), radialView, treeCompareView, parsetView); //remove old views in listeners
                         ObserverManager.setListeners(listeners);
-
-                        
                         radialView = radial();   
-
                         //start of change
                         //treeCompareView = treeCompare();     
                         //parsetView = parset();    
                         //end of change
-
-
-
-
                     } else {
                         $("#treemap").html(""); 
                         var listeners = _.without(ObserverManager.getListeners(), treeCompareView); //remove old views in listeners
