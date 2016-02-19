@@ -51,8 +51,8 @@ var radial = function(){
 
 	//注意：JS中函数参数传递不是按引用传的
 	//函数内部如果直接给传入的对象赋值，效果是对内部的拷贝赋值；如果修改传入的对象的成员，那么修改能够影响到传入的对象
-
-	merge_preprocess_rawdata(dataset.dataList,target_root,1);
+	var curtreeindex=1;
+	merge_preprocess_rawdata(dataset.dataList,target_root,curtreeindex);
 
 	reorder_tree(target_root);
 	cal_repeat_time(target_root);
@@ -164,6 +164,7 @@ var radial = function(){
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	
+	var maintain_tooltip_display=[];
 
 	draw_barcoded_tree(linear_tree,1);
 
@@ -366,29 +367,32 @@ var radial = function(){
 	}
 	var g;
 	//标记每个元素的tooltip在mouseout时是隐去还是保持
-	var maintain_tooltip_display=[];
-	for (var i=0;i<linear_tree.length;++i)
-	{
-		maintain_tooltip_display[i]=false;
-	}
-	for (var i=0;i<linear_tree.length;++i)
-	{
-		tip_array[i]=d3.tip()
-			.attr('class', 'd3-tip')
-			.offset([-10, 0])
-			.html(function(d) {
-				return 	"<strong>name:</strong> <span style='color:red'>" + d.name  + "</span>"+ " " +
-				    	"<strong>flow size:</strong> <span style='color:red'>" + d.trees_values[cur_tree_index] + "</span>"+ " " +
-				    	"<strong>depth:</strong> <span style='color:red'>" + d._depth + "</span>";
-				 });
-		svg.call(tip_array[i]);
-	}
+	
+	
 	//---------------------------------------------------------------------------
 	//---------------------------------------------------------------------------
 
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
 	function draw_barcoded_tree(linear_tree,cur_tree_index)
 	{
+		var svg = d3.select('#radial'); 
+		for (var i=0;i<linear_tree.length;++i)
+		{
+			maintain_tooltip_display[i]=false;
+		}
+		for (var i=0;i<linear_tree.length;++i)
+		{
+			tip_array[i]=d3.tip()
+				.attr('class', 'd3-tip')
+				.offset([-10, 0])
+				.html(function(d) {
+					return 	"<strong>name:</strong> <span style='color:red'>" + d.name  + "</span>"+ " " +
+					    	"<strong>flow size:</strong> <span style='color:red'>" + d.trees_values[cur_tree_index] + "</span>"+ " " +
+					    	"<strong>depth:</strong> <span style='color:red'>" + d._depth + "</span>";
+					 });
+
+			svg.call(tip_array[i]);
+		}
 		for (var i=0;i<tip_array.length;++i){
 			tip_array[i].hide();
 		}
@@ -404,7 +408,6 @@ var radial = function(){
 		}
 		console.log(linear_tree);
 		d3.select("#radial").selectAll("*").remove();
-		var svg = d3.select('#radial'); 
 		svg.selectAll('.bar')
 		.data(linear_tree)
 		.enter()
@@ -515,6 +518,24 @@ var radial = function(){
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
 	function draw_reduce_barcoded_tree(linear_tree,cur_tree_index)
 	{
+		var svg = d3.select('#radial'); 
+		for (var i=0;i<linear_tree.length;++i)
+		{
+			maintain_tooltip_display[i]=false;
+		}
+		for (var i=0;i<linear_tree.length;++i)
+		{
+			tip_array[i]=d3.tip()
+				.attr('class', 'd3-tip')
+				.offset([-10, 0])
+				.html(function(d) {
+					return 	"<strong>name:</strong> <span style='color:red'>" + d.name  + "</span>"+ " " +
+					    	"<strong>flow size:</strong> <span style='color:red'>" + d.trees_values[cur_tree_index] + "</span>"+ " " +
+					    	"<strong>depth:</strong> <span style='color:red'>" + d._depth + "</span>";
+					 });
+			svg.call(tip_array[i]);
+		}
+
 		for (var i=0;i<tip_array.length;++i){
 			tip_array[i].hide();
 		}
@@ -541,7 +562,6 @@ var radial = function(){
 			acc_depth_node_num[linear_tree[i]._depth]=acc_depth_node_num[linear_tree[i]._depth]+1;
 		}
 		d3.select("#radial").selectAll("*").remove();
-		var svg = d3.select('#radial'); 
 		svg.selectAll('.bar')
 		.data(linear_tree)
 		.enter()
@@ -801,7 +821,7 @@ var radial = function(){
 		*/
 	}
 	
-	function draw_adjust_button()
+		function draw_adjust_button()
 		{
 			var rect_attribute_button={
 				
@@ -822,36 +842,36 @@ var radial = function(){
 			creat_button(rect_attribute_button);
 		}
 		function creat_button(rect_attribute_button){
-				var width = rect_attribute_button.width;  
-				var height = rect_attribute_button.height; 
-				var biasx=rect_attribute_button.biasx;
-				var biasy=rect_attribute_button.biasy;
-				var background_color=rect_attribute_button.background_color;
-				var mouseover_function=rect_attribute_button.mouseover_function;
-				var mouseout_function=rect_attribute_button.mouseout_function;
-				var mouseclick_function=rect_attribute_button.mouseclick_function;
-				var shown_string=rect_attribute_button.button_string;
-				var font_color=rect_attribute_button.font_color;
-				var font_size=rect_attribute_button.font_size;
-				var cur_id=rect_attribute_button.cur_id;
-				var cur_class=rect_attribute_button.cur_class;
-				var cur_data=rect_attribute_button.cur_data;
-				var cur_button_shape=rect_attribute_button.button_shape;
-				var cur_svg=rect_attribute_button.cur_svg;
+			var width = rect_attribute_button.width;  
+			var height = rect_attribute_button.height; 
+			var biasx=rect_attribute_button.biasx;
+			var biasy=rect_attribute_button.biasy;
+			var background_color=rect_attribute_button.background_color;
+			var mouseover_function=rect_attribute_button.mouseover_function;
+			var mouseout_function=rect_attribute_button.mouseout_function;
+			var mouseclick_function=rect_attribute_button.mouseclick_function;
+			var shown_string=rect_attribute_button.button_string;
+			var font_color=rect_attribute_button.font_color;
+			var font_size=rect_attribute_button.font_size;
+			var cur_id=rect_attribute_button.cur_id;
+			var cur_class=rect_attribute_button.cur_class;
+			var cur_data=rect_attribute_button.cur_data;
+			var cur_button_shape=rect_attribute_button.button_shape;
+			var cur_svg=rect_attribute_button.cur_svg;
 			
-					var tooltip=d3.selectAll("#tooltip");
+			var tooltip=d3.selectAll("#tooltip");
 
-				if (typeof(cur_button_shape)=="undefined")
-					{
-					var button = cur_svg.append("rect");
-				}
-				else//自定义按钮形状
-				{
-					var button = cur_svg.append("path")
-								 		.attr("d",cur_button_shape)
-								 		.attr("stroke","red")
-								 		.attr("stroke-width",1);
-				}
+			if (typeof(cur_button_shape)=="undefined")
+			{
+				var button = cur_svg.append("rect");
+			}
+			else//自定义按钮形状
+			{
+				var button = cur_svg.append("path")
+							 		.attr("d",cur_button_shape)
+							 		.attr("stroke","red")
+							 		.attr("stroke-width",1);
+			}
 
 			button.datum(cur_data)//绑定数据以后，后面的function才能接到d，否则只能接到this
 					.on("mouseover",mouseover_function)
@@ -903,7 +923,8 @@ var radial = function(){
 			draw_barcoded_tree(linear_tree,1);
 		}else{
 			$("#state-change").addClass("active");
-			draw_reduce_barcoded_tree(linear_tree,1);
+			var curtreeindex=1;
+			draw_reduce_barcoded_tree(linear_tree,curtreeindex);
 		}
 	});
     Radial.OMListen = function(message, data) {
