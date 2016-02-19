@@ -101,13 +101,16 @@ var radial = function(){
 	        	changePercentage(finalValue);
 	        })
 	        .on("dragend",function(d,i){
-	        	console.log("dragEnd",dragDis);
 	        	var value = dragDis / sliderDivHeight * max;
 	        	var finalValue = originArray[i] + value;
 	        	finalValue = finalValue > max ? max : finalValue;
 	        	finalValue = finalValue < min ? min : finalValue;
 	        	widthArray[i] = finalValue;
-	        	draw_barcoded_tree(linear_tree,1);
+	        	if($("#state-change").hasClass("active")){
+	        		draw_reduce_barcoded_tree(linear_tree,1);
+	        	}else{
+	        		draw_barcoded_tree(linear_tree,1);
+	        	}
 	        	changePercentage(finalValue);
 	        });
 
@@ -371,9 +374,476 @@ var radial = function(){
 	}
 	var g;
 	//标记每个元素的tooltip在mouseout时是隐去还是保持
-	
-	
+	function draw_reduce_barcoded_depth(linear_tree,former_depth,depth){
+		var rowNum = 7;
+		var divideNum = rowNum * 3 - 1;
+		var barHeight = rectHeight / divideNum * 2;
+		var barGap = rectHeight/divideNum;
+		var barWidth = 10;
+		var curDrawDep = 10;
+		var formerNodeRepeat = 0;
+		var formerDepth = 0;
+		console.log(linear_tree);
+		xCompute = 0;//用于累积当前方块的横坐标
+		//按下换depth的button时，要把原来的tip全都删光
+		for (var i=0;i<linear_tree.length;++i)
+			tip_array[i].hide();//hide可以不传参数
+
+		console.log(depth);
+		xCompute = 0;
+		var formerWidthArray = [];
+		var currentDepth = former_depth - 1;
+		for(var i = 0;i < changeWidthArray.length;i++){
+			formerWidthArray[i] = changeWidthArray[i];
+		}
+		for(var i = 0; i < widthArray.length; i++){
+			if(i > currentDepth){
+				changeWidthArray[i] = 0;
+			}else{
+				changeWidthArray[i] = widthArray[i];
+			}
+		}
+		svg.selectAll('rect')
+		.data(linear_tree)
+		.transition()//过渡动画
+			//.duration(500)
+		.attr('x',function(d,i){
+						//将这一节点的重复次数变成数字类型，便于以后进行处理
+			var repeatTime = +d.continuous_repeat_time;
+			//只有节点的重复次数大于1才会将这个节点进行记录下来，而d._depth <= curDrawDep表示的是所记录下的节点不会被其不重要的字节点覆盖
+			if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+				//将这个节点记录下来
+				curDrawDep = +d._depth;
+			}
+			//如果上一个节点的在缩略但是这个节点没有达到每一列的最后一个缩略位置，需要在这个节点的位置对他进行换列处理
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
+				curDrawDep = 10;
+				if((formerNodeRepeat - 1)%rowNum != 0){
+					xCompute = xCompute + 2 * widthArray[d._depth] + 1;
+				}
+			}
+			//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
+			if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+				xCompute = xCompute + widthArray[d._depth]/3 + 1;
+			}
+			//下面是对于绘制的节点的x位置进行计算
+			var backXCompute = xCompute;
+			if(d._depth < curDrawDep){
+				//比当前记录的depth层次更高，那么两个节点之间空出1px
+				xCompute = xCompute + widthArray[d._depth] + 1;//两个节点之间空1px
+			}else if(d._depth == curDrawDep){
+				//如果是当前缩略的节点，那么计算节点的x坐标值是就需要进行堆叠起来
+				if((repeatTime - 1)%rowNum == 0){
+					xCompute = xCompute + widthArray[d._depth] + 1;
+				}
+			}
+			if(d.continuous_repeat_time != 1 && d._depth <= curDrawDep){
+				formerNodeRepeat = d.continuous_repeat_time;
+				formerDepth = d._depth;
+			}
+			return backXCompute;
+		})
+		.attr('y',function(d,i){
+			var repeatTime = +d.continuous_repeat_time;
+			//用于记录当前有效的depth
+			if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+				curDrawDep = +d._depth;
+			}
+			//用于恢复depth，让以后的节点正常的进行绘制
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+				curDrawDep = 10;
+			}
+			//如果是当前绘制层次的节点，那么需要对应的控制所绘制节点y坐标值
+			if(d._depth == curDrawDep){
+				return rectY + (repeatTime - 2) % rowNum * (barGap + barHeight);
+			}
+			return rectY;
+		})
+		.attr('width',function(d,i){
+			//用于记录当前有效的depth值
+			if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+				curDrawDep = +d._depth;
+			}
+			//用于恢复depth值，让后面的节点可以进行正常的绘制
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+				curDrawDep = 10;
+			}
+			var hisWidth = 0;
+			var d_depth = +d._depth;
+			if(d._depth < curDrawDep){
+				hisWidth = changeWidthArray[d._depth];
+			}else if(d._depth == curDrawDep){
+				hisWidth = changeWidthArray[d._depth];
+				//hisWidth = barWidth;
+			}else if(d._depth > curDrawDep){
+				//如果是比当前记录的缩略层次更低，那么就需要将hiswidth设置为0
+				hisWidth = 0;
+			}
+			return hisWidth;
+		})
+		.attr('height',function(d,i){
+			//用于记录当前有效的depth值
+			if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+				curDrawDep = +d._depth;
+			}
+			//用于恢复depth的值，从而使后面的节点可以正常的进行绘制
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+				curDrawDep = 10;
+			}
+			var hisWidth = 0;
+			var d_depth = +d._depth;
+			if(d._depth == curDrawDep){
+				//如果绘制的层次是当前的缩略的层次，那么需要返回到鹅是缩略节点的barheight
+				return barHeight;
+			}
+			return rectHeight;
+		})
+		.call(endall, function() { 
+			draw_depth_move(currentDepth,depth);
+		});
+		function draw_depth_move(currentDepth,depth){
+			console.log(currentDepth);
+			console.log(changeWidthArray);
+			xCompute = 0;
+			svg.selectAll('rect')
+			.data(linear_tree)
+				.transition()
+			.attr('x',function(d,i){
+							//将这一节点的重复次数变成数字类型，便于以后进行处理
+				var repeatTime = +d.continuous_repeat_time;
+				//只有节点的重复次数大于1才会将这个节点进行记录下来，而d._depth <= curDrawDep表示的是所记录下的节点不会被其不重要的字节点覆盖
+				if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+					//将这个节点记录下来
+					curDrawDep = +d._depth;
+				}
+				//如果上一个节点的在缩略但是这个节点没有达到每一列的最后一个缩略位置，需要在这个节点的位置对他进行换列处理
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
+					curDrawDep = 10;
+					if((formerNodeRepeat - 1)%rowNum != 0){
+						xCompute = xCompute + 2 * changeWidthArray[d._depth] + 1;
+					}
+				}
+				//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
+				if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+					xCompute = xCompute + changeWidthArray[d._depth]/3 + 1;
+				}
+				//下面是对于绘制的节点的x位置进行计算
+				var backXCompute = xCompute;
+				if(d._depth < curDrawDep){
+					//比当前记录的depth层次更高，那么两个节点之间空出1px
+					xCompute = xCompute + changeWidthArray[d._depth] + 1;//两个节点之间空1px
+				}else if(d._depth == curDrawDep){
+					//如果是当前缩略的节点，那么计算节点的x坐标值是就需要进行堆叠起来
+					if((repeatTime - 1)%rowNum == 0){
+						xCompute = xCompute + changeWidthArray[d._depth] + 1;
+					}
+				}
+				if(d.continuous_repeat_time != 1 && d._depth <= curDrawDep){
+					formerNodeRepeat = d.continuous_repeat_time;
+					formerDepth = d._depth;
+				}
+				return backXCompute;
+			})
+			.attr('y',function(d,i){
+				var repeatTime = +d.continuous_repeat_time;
+				//用于记录当前有效的depth
+				if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+					curDrawDep = +d._depth;
+				}
+				//用于恢复depth，让以后的节点正常的进行绘制
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+					curDrawDep = 10;
+				}
+				//如果是当前绘制层次的节点，那么需要对应的控制所绘制节点y坐标值
+				if(d._depth == curDrawDep){
+					return rectY + (repeatTime - 2) % rowNum * (barGap + barHeight);
+				}
+				return rectY;
+			})
+			.attr('width',function(d,i){
+				//用于记录当前有效的depth值
+				if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+					curDrawDep = +d._depth;
+				}
+				//用于恢复depth值，让后面的节点可以进行正常的绘制
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+					curDrawDep = 10;
+				}
+				var hisWidth = 0;
+				var d_depth = +d._depth;
+				if(d._depth < curDrawDep){
+					hisWidth = changeWidthArray[d._depth];
+				}else if(d._depth == curDrawDep){
+					hisWidth = changeWidthArray[d._depth];
+					//hisWidth = barWidth;
+				}else if(d._depth > curDrawDep){
+					//如果是比当前记录的缩略层次更低，那么就需要将hiswidth设置为0
+					hisWidth = 0;
+				}
+				return hisWidth;
+			})
+			.attr('height',function(d,i){
+				//用于记录当前有效的depth值
+				if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+					curDrawDep = +d._depth;
+				}
+				//用于恢复depth的值，从而使后面的节点可以正常的进行绘制
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+					curDrawDep = 10;
+				}
+				var hisWidth = 0;
+				var d_depth = +d._depth;
+				if(d._depth == curDrawDep){
+					//如果绘制的层次是当前的缩略的层次，那么需要返回到鹅是缩略节点的barheight
+					return barHeight;
+				}
+				return rectHeight;
+			})
+			//call 相当于定义一个函数，再把选择的元素给它
+			.call(endall, function(){
+				depth = +depth;
+				currentDepth = +currentDepth;
+				if(currentDepth == depth){
+					draw_link(); 
+				}else{
+					draw_reduce_barcoded_depth(linear_tree,currentDepth,depth)
+				}
+			});
+		} 
+	}
 	//---------------------------------------------------------------------------
+	function draw_reduce_barcoded_move(linear_tree,former_depth,depth){
+		var rowNum = 7;
+		var divideNum = rowNum * 3 - 1;
+		var barHeight = rectHeight / divideNum * 2;
+		var barGap = rectHeight/divideNum;
+		var barWidth = 10;
+		var curDrawDep = 10;
+		var formerNodeRepeat = 0;
+		var formerDepth = 0;
+		console.log(linear_tree);
+		xCompute = 0;//用于累积当前方块的横坐标
+
+		var formerWidthArray = [];
+		console.log("former_depth:"+former_depth+"depth:"+depth);
+		former_depth = +former_depth;
+		var currentDepth = former_depth + 1;
+		console.log("currentDepth:" + currentDepth);
+		for(var i = 0;i < changeWidthArray.length;i++){
+			formerWidthArray[i] = changeWidthArray[i];
+		}
+		for(var i = 0; i < widthArray.length; i++){
+			if(i > currentDepth){
+				changeWidthArray[i] = 0;
+			}else{
+				changeWidthArray[i] = widthArray[i];
+			}
+		}
+		svg.selectAll('rect')
+		.data(linear_tree)
+		.transition()
+		.attr('x',function(d,i){
+						//将这一节点的重复次数变成数字类型，便于以后进行处理
+			var repeatTime = +d.continuous_repeat_time;
+			//只有节点的重复次数大于1才会将这个节点进行记录下来，而d._depth <= curDrawDep表示的是所记录下的节点不会被其不重要的字节点覆盖
+			if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+				//将这个节点记录下来
+				curDrawDep = +d._depth;
+			}
+			//如果上一个节点的在缩略但是这个节点没有达到每一列的最后一个缩略位置，需要在这个节点的位置对他进行换列处理
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
+				curDrawDep = 10;
+				if((formerNodeRepeat - 1)%rowNum != 0){
+					xCompute = xCompute + 2 * changeWidthArray[d._depth] + 1;
+				}
+			}
+			//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
+			if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+				xCompute = xCompute + changeWidthArray[d._depth]/3 + 1;
+			}
+			//下面是对于绘制的节点的x位置进行计算
+			var backXCompute = xCompute;
+			if(d._depth < curDrawDep){
+				//比当前记录的depth层次更高，那么两个节点之间空出1px
+				xCompute = xCompute + changeWidthArray[d._depth] + 1;//两个节点之间空1px
+			}else if(d._depth == curDrawDep){
+				//如果是当前缩略的节点，那么计算节点的x坐标值是就需要进行堆叠起来
+				if((repeatTime - 1)%rowNum == 0){
+					xCompute = xCompute + changeWidthArray[d._depth] + 1;
+				}
+			}
+			if(d.continuous_repeat_time != 1 && d._depth <= curDrawDep){
+				formerNodeRepeat = d.continuous_repeat_time;
+				formerDepth = d._depth;
+			}
+			return backXCompute;
+		})
+		.attr('y',function(d,i){
+				var repeatTime = +d.continuous_repeat_time;
+				//用于记录当前有效的depth
+				if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+					curDrawDep = +d._depth;
+				}
+				//用于恢复depth，让以后的节点正常的进行绘制
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+					curDrawDep = 10;
+				}
+				//如果是当前绘制层次的节点，那么需要对应的控制所绘制节点y坐标值
+				if(d._depth == curDrawDep){
+					return rectY + (repeatTime - 2) % rowNum * (barGap + barHeight);
+				}
+				return rectY;
+		})
+		.attr('width',function(d,i){
+				//用于记录当前有效的depth值
+				if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+					curDrawDep = +d._depth;
+				}
+				//用于恢复depth值，让后面的节点可以进行正常的绘制
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+					curDrawDep = 10;
+				}
+				var hisWidth = 0;
+				var d_depth = +d._depth;
+				if(d._depth < curDrawDep){
+					hisWidth = formerWidthArray[d._depth];
+				}else if(d._depth == curDrawDep){
+					hisWidth = formerWidthArray[d._depth];
+					//hisWidth = barWidth;
+				}else if(d._depth > curDrawDep){
+					//如果是比当前记录的缩略层次更低，那么就需要将hiswidth设置为0
+					hisWidth = 0;
+				}
+				return hisWidth;
+		})
+		.attr('height',function(d,i){
+			//用于记录当前有效的depth值
+			if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+				curDrawDep = +d._depth;
+			}
+			//用于恢复depth的值，从而使后面的节点可以正常的进行绘制
+			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+				curDrawDep = 10;
+			}
+			var hisWidth = 0;
+			var d_depth = +d._depth;
+			if(d._depth == curDrawDep){
+				//如果绘制的层次是当前的缩略的层次，那么需要返回到鹅是缩略节点的barheight
+				return barHeight;
+			}
+			return rectHeight;
+		})
+		.call(endall, function() {
+		 	draw_depth_show(currentDepth,depth); 
+		});
+		//----------------------------------------------------------
+		function draw_depth_show(currentDepth,depth){
+			xCompute = 0;
+			svg.selectAll('rect')
+			.data(linear_tree)
+			.transition()
+			.attr('x',function(d,i){
+				//将这一节点的重复次数变成数字类型，便于以后进行处理
+				var repeatTime = +d.continuous_repeat_time;
+				//只有节点的重复次数大于1才会将这个节点进行记录下来，而d._depth <= curDrawDep表示的是所记录下的节点不会被其不重要的字节点覆盖
+				if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+					//将这个节点记录下来
+					curDrawDep = +d._depth;
+				}
+				//如果上一个节点的在缩略但是这个节点没有达到每一列的最后一个缩略位置，需要在这个节点的位置对他进行换列处理
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
+					curDrawDep = 10;
+					if((formerNodeRepeat - 1)%rowNum != 0){
+						xCompute = xCompute + 2 * changeWidthArray[d._depth] + 1;
+					}
+				}
+				//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
+				if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+					xCompute = xCompute + changeWidthArray[d._depth]/3 + 1;
+				}
+				//下面是对于绘制的节点的x位置进行计算
+				var backXCompute = xCompute;
+				if(d._depth < curDrawDep){
+					//比当前记录的depth层次更高，那么两个节点之间空出1px
+					xCompute = xCompute + changeWidthArray[d._depth] + 1;//两个节点之间空1px
+				}else if(d._depth == curDrawDep){
+					//如果是当前缩略的节点，那么计算节点的x坐标值是就需要进行堆叠起来
+					if((repeatTime - 1)%rowNum == 0){
+						xCompute = xCompute + changeWidthArray[d._depth] + 1;
+					}
+				}
+				if(d.continuous_repeat_time != 1 && d._depth <= curDrawDep){
+					formerNodeRepeat = d.continuous_repeat_time;
+					formerDepth = d._depth;
+				}
+				return backXCompute;
+			})
+			.attr('y',function(d,i){
+				var repeatTime = +d.continuous_repeat_time;
+				//用于记录当前有效的depth
+				if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
+					curDrawDep = +d._depth;
+				}
+				//用于恢复depth，让以后的节点正常的进行绘制
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+					curDrawDep = 10;
+				}
+				//如果是当前绘制层次的节点，那么需要对应的控制所绘制节点y坐标值
+				if(d._depth == curDrawDep){
+					return rectY + (repeatTime - 2) % rowNum * (barGap + barHeight);
+				}
+				return rectY;
+			})
+			.attr('width',function(d,i){
+				//用于记录当前有效的depth值
+				if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+					curDrawDep = +d._depth;
+				}
+				//用于恢复depth值，让后面的节点可以进行正常的绘制
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+					curDrawDep = 10;
+				}
+				var hisWidth = 0;
+				var d_depth = +d._depth;
+				if(d._depth < curDrawDep){
+					hisWidth = changeWidthArray[d._depth];
+				}else if(d._depth == curDrawDep){
+					hisWidth = changeWidthArray[d._depth];
+					//hisWidth = barWidth;
+				}else if(d._depth > curDrawDep){
+					//如果是比当前记录的缩略层次更低，那么就需要将hiswidth设置为0
+					hisWidth = 0;
+				}
+				return hisWidth;
+			})
+			.attr('height',function(d,i){
+				//用于记录当前有效的depth值
+				if(d.continuous_repeat_time > 1  && d._depth <= curDrawDep){
+					curDrawDep = +d._depth;
+				}
+				//用于恢复depth的值，从而使后面的节点可以正常的进行绘制
+				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1)){
+					curDrawDep = 10;
+				}
+				var hisWidth = 0;
+				var d_depth = +d._depth;
+				if(d._depth == curDrawDep){
+					//如果绘制的层次是当前的缩略的层次，那么需要返回到鹅是缩略节点的barheight
+					return barHeight;
+				}
+				return rectHeight;
+			})
+			.call(endall, function() { 
+				depth = +depth;
+				currentDepth = +currentDepth;
+				if(currentDepth == depth){
+					draw_link();
+				}else{
+					draw_reduce_barcoded_move(linear_tree,currentDepth,depth)
+				}
+			});
+		}
+	}
 	//---------------------------------------------------------------------------
 
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
@@ -875,9 +1345,9 @@ var radial = function(){
 		for (var i = 0; i <= dep; i++)
 			$("#radial-depth-controller .level-btn[level=" + i + "]").addClass("active");
 		if(formerDepth < dep){
-			draw_barcoded_tree_move(linear_tree,formerDepth,dep);
+			draw_reduce_barcoded_move(linear_tree,formerDepth,dep);
 		}else if(formerDepth > dep){
-			draw_barcoded_tree_depth(linear_tree,formerDepth,dep);
+			draw_reduce_barcoded_depth(linear_tree,formerDepth,dep);
 		}
 		formerDepth = dep;
 	});
