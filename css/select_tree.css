@@ -34,14 +34,34 @@
   fill: #C0C0C0;
 }
 */
-
+/*按照radial.css中slider-hover-...的颜色*/
+#mainTimeline .level-9.selected_seperate_bar {
+  fill: #b3e2cd;
+}
+#mainTimeline .level-7.selected_seperate_bar {
+  fill: #fdcdac;
+}
+#mainTimeline .level-5.selected_seperate_bar {
+  fill: #cbd5e8;
+}
+#mainTimeline .level-3.selected_seperate_bar {
+  fill: #f4cae4;
+}
+#mainTimeline .level-1.selected_seperate_bar {
+  fill: #e6f5c9;
+}
+/*
 #mainTimeline .selected_seperate_bar {
   fill: #FF0000;
 }
+*/
 
 #mainTimeline .current {
   fill: #1F77B4;
+  stroke: #b2df8a;
+  stroke-width: 2px;
 }
+
 
 .label-wrapper > .label  {
   pointer-events: none;
