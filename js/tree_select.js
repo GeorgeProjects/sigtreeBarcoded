@@ -17,6 +17,8 @@ var treeSelect = function(){
 
 
 
+
+
 	var sortMode = "time";
 	var datadimMode = "flowsize";
 
@@ -112,7 +114,7 @@ var treeSelect = function(){
 
 	var viewWidth = +(d3.select("#srocllDiv").style("width").replace("px",""));
 	var fontSize = Math.round(viewWidth / 18);
-	$("#innerTopRight").css("font-size", 12 + "px");  
+	$("#innerTopRight").css("font-size", 2 + "px");  
 
 	//处理好四个数组
 	function processStatData() {
@@ -126,6 +128,12 @@ var treeSelect = function(){
 			 	timeSortArray_flowsize[i].index = i;
 			 	timeSortArray_flowsize[i].position = i;
 			 	timeSortArray_flowsize[i].sumNode =  + statData[i].sumNode;
+
+			 	timeSortArray_flowsize[i].L0Node =  + statData[i].L0Node;
+			 	timeSortArray_flowsize[i].L1Node =  + statData[i].L1Node;
+			 	timeSortArray_flowsize[i].L2Node =  + statData[i].L2Node;
+			 	timeSortArray_flowsize[i].L3Node =  + statData[i].L3Node;
+			 	timeSortArray_flowsize[i].L4Node =  + statData[i].L4Node;
 			}
 		}
 
@@ -137,6 +145,12 @@ var treeSelect = function(){
 			 	propotionArray_flowsize[i].value =+ statData[i].sumProportion;
 			 	propotionArray_flowsize[i].time = statData[i].file.replace("XX.csv","");
 			 	propotionArray_flowsize[i].index = i;	
+
+			 	propotionArray_flowsize[i].L0Node = + statData[i].L0Node;
+			 	propotionArray_flowsize[i].L1Node = + statData[i].L1Node;
+			 	propotionArray_flowsize[i].L2Node = + statData[i].L2Node;
+			 	propotionArray_flowsize[i].L3Node = + statData[i].L3Node;
+			 	propotionArray_flowsize[i].L4Node = + statData[i].L4Node;
 			}
 		 	propotionArray_flowsize.sort(function(a, b) {
 		 		return a.value - b.value;
@@ -487,7 +501,7 @@ var treeSelect = function(){
 				}
 
 				compareNum = selectedID;
-				
+
 				changeComparedData();
 				d3.select("#append-rect").select("#percen-rect").remove();
 			});
@@ -528,7 +542,7 @@ var treeSelect = function(){
 				.attr("y", y)
 				.text("A");
 
-			console.log(compareArray,dataList,dataList[compareArray[1]].time.split("-")[0]);
+			console.log(dataList);
 			$("#innerTopRight #label-A .date_description").html(function() {
 				if (compareArray.length > 0) 
 				{
@@ -556,11 +570,23 @@ var treeSelect = function(){
 				if (compareArray.length > 0)
 				{
 					var nodeNumDescription = dataList[compareArray[1]].sumNode;
-					console.log("nodeNumDescription:"+nodeNumDescription);
 					return nodeNumDescription;
 				}
 				return "";
 			});
+
+			for (var i=0;i<=4;++i)
+			{
+				$("#innerTopRight #label-A .L"+i+"node_num_description").text(function() {
+					if (compareArray.length > 0)
+					{
+						var nodeNumDescription = dataList[compareArray[1]]["L"+i+"Node"];
+						return nodeNumDescription;
+					}
+					return "";
+				});
+			}
+
 			compareArray[1] = compareNum;
 			ObserverManager.post("changeData", compareArray);
 		}

@@ -27,8 +27,8 @@
   padding:5px 5px 5px 5px;
   overflow-y: scroll;
   overflow-x: hidden;
+  line-height:1.2;/*右上角窗口中字体的行间距*/
 }
-
 /*
 #mainTimeline .bar {
   fill: #C0C0C0;
