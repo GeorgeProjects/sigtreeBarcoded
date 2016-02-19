@@ -107,13 +107,17 @@ var radial = function(){
 	        	finalValue = finalValue < min ? min : finalValue;
 	        	widthArray[i] = finalValue;
 	        	if($("#state-change").hasClass("active")){
-	        		draw_reduce_barcoded_tree(linear_tree,1);
-	        	}else{
-	        		draw_barcoded_tree(linear_tree,1);
-	        	}
+					draw_reduce_barcoded_tree(linear_tree,1);
+					draw_reduce_barcoded_depth(linear_tree,shown_depth,shown_depth);
+					formerDepth = shown_depth;
+				}else{
+					draw_barcoded_tree(linear_tree,1);
+					draw_barcoded_tree_depth(linear_tree,shown_depth,shown_depth);
+					formerDepth = shown_depth;
+				}
 	        	changePercentage(finalValue);
 	        });
-
+	    
 	    sliderSvg.select("#back-slider").remove();
 	    sliderSvg.select("#slider-g")
 			.append("rect")
@@ -171,16 +175,12 @@ var radial = function(){
 
 	if($("#state-change").hasClass("active")){
 		draw_reduce_barcoded_tree(linear_tree,1);
-		if(shown_depth!=4 && shown_depth!=undefined){
-			draw_reduce_barcoded_depth(linear_tree,4,shown_depth);
-			formerDepth = shown_depth;
-		}
+		draw_reduce_barcoded_depth(linear_tree,shown_depth,shown_depth);
+		formerDepth = shown_depth;
 	}else{
 		draw_barcoded_tree(linear_tree,1);
-		if(shown_depth!=4 && shown_depth!=undefined){
-			draw_barcoded_tree_depth(linear_tree,4,shown_depth);
-			formerDepth = shown_depth;
-		}
+		draw_barcoded_tree_depth(linear_tree,shown_depth,shown_depth);
+		formerDepth = shown_depth;
 	}
 	function draw_barcoded_tree_depth(linear_tree,former_depth,depth){
 		//按下换depth的button时，要把原来的tip全都删光
@@ -190,7 +190,7 @@ var radial = function(){
 		console.log(depth);
 		xCompute = 0;
 		var formerWidthArray = [];
-		var currentDepth = former_depth - 1;
+		var currentDepth = former_depth;
 		for(var i = 0;i < changeWidthArray.length;i++){
 			formerWidthArray[i] = changeWidthArray[i];
 		}
@@ -254,6 +254,7 @@ var radial = function(){
 				if(currentDepth == depth){
 					draw_link(); 
 				}else{
+					currentDepth = currentDepth - 1;
 					draw_barcoded_tree_depth(linear_tree,currentDepth,depth)
 				}
 			});
@@ -266,7 +267,7 @@ var radial = function(){
 		var formerWidthArray = [];
 		console.log("former_depth:"+former_depth+"depth:"+depth);
 		former_depth = +former_depth;
-		var currentDepth = former_depth + 1;
+		var currentDepth = former_depth;
 		for(var i = 0;i < changeWidthArray.length;i++){
 			formerWidthArray[i] = changeWidthArray[i];
 		}
@@ -327,6 +328,7 @@ var radial = function(){
 				if(currentDepth == depth){
 					draw_link();
 				}else{
+					currentDepth = currentDepth + 1;
 					draw_barcoded_tree_move(linear_tree,currentDepth,depth)
 				}
 			});
@@ -399,7 +401,7 @@ var radial = function(){
 		console.log(depth);
 		xCompute = 0;
 		var formerWidthArray = [];
-		var currentDepth = former_depth - 1;
+		var currentDepth = former_depth;
 		for(var i = 0;i < changeWidthArray.length;i++){
 			formerWidthArray[i] = changeWidthArray[i];
 		}
@@ -616,6 +618,7 @@ var radial = function(){
 				if(currentDepth == depth){
 					draw_link(); 
 				}else{
+					currentDepth = currentDepth - 1;
 					draw_reduce_barcoded_depth(linear_tree,currentDepth,depth)
 				}
 			});
@@ -637,7 +640,7 @@ var radial = function(){
 		var formerWidthArray = [];
 		console.log("former_depth:"+former_depth+"depth:"+depth);
 		former_depth = +former_depth;
-		var currentDepth = former_depth + 1;
+		var currentDepth = former_depth;
 		console.log("currentDepth:" + currentDepth);
 		for(var i = 0;i < changeWidthArray.length;i++){
 			formerWidthArray[i] = changeWidthArray[i];
@@ -852,6 +855,7 @@ var radial = function(){
 				if(currentDepth == depth){
 					draw_link();
 				}else{
+					currentDepth = currentDepth + 1;
 					draw_reduce_barcoded_move(linear_tree,currentDepth,depth)
 				}
 			});
