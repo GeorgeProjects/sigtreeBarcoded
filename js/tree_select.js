@@ -43,16 +43,23 @@ var treeSelect = function(){
 
 			if (typeof(aL0Node)!="undefined")
 			{
-				return "<span style='font-size:12px;'>	date:" + aTime +
-													"	sumNode:" + aValue +
-													"	L0Node:" + aL0Node +
-													"	L1Node:" + aL1Node +
-													"	L2Node:" + aL2Node +
-													"	L3Node:" + aL3Node +
-													"	L4Node:" + aL4Node +
-													"</span>";
+				return 	"date: " + "<span style='color:red'>" + aTime + "</span>" + " " +
+						"sumNode: " + "<span style='color:red'>" + aValue + "</span>" + " " +
+						"L0Node: " + "<span style='color:red'>" + aL0Node + "</span>" + " " +
+						"L1Node: " + "<span style='color:red'>" + aL1Node + "</span>" + " " +
+						"L2Node: " + "<span style='color:red'>" + aL2Node + "</span>" + " " +
+						"L3Node: " + "<span style='color:red'>" + aL3Node + "</span>" + " " +
+						"L4Node: " + "<span style='color:red'>" + aL4Node ;
 			}
-			else
+			else/*
+"date:" + "<span style='color:red'>" + aTime + "</span>" + " " +
+													"sumNode:" + "<span style='color:red'>" + aValue + "</span>" + " " +
+													"L0Node:" + "<span style='color:red'>" + aL0Node + "</span>" + " " +
+													"L1Node:" + "<span style='color:red'>" + aL1Node + "</span>" + " " +
+													"L2Node:" + "<span style='color:red'>" + aL2Node + "</span>" + " " +
+													"L3Node:" + "<span style='color:red'>" + aL3Node + "</span>" + " " +
+													"L4Node:" + "<span style='color:red'>" + aL4Node + "</span>"
+				*/
 			{
 				return "<span style='font-size:12px;'>	date:" + aTime +
 													"	values:" + aValue +

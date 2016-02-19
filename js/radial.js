@@ -384,6 +384,8 @@ var radial = function(){
 	var g;
 	//标记每个元素的tooltip在mouseout时是隐去还是保持
 	function draw_reduce_barcoded_depth(linear_tree,former_depth,depth){
+		
+
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
 		var barHeight = rectHeight / divideNum * 2;
@@ -626,6 +628,8 @@ var radial = function(){
 	}
 	//---------------------------------------------------------------------------
 	function draw_reduce_barcoded_move(linear_tree,former_depth,depth){
+		
+
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
 		var barHeight = rectHeight / divideNum * 2;
@@ -881,9 +885,9 @@ var radial = function(){
 				.attr('class', 'd3-tip')
 				.offset([-10, 0])
 				.html(function(d) {
-					return 	"<strong>name:</strong> <span style='color:red'>" + d.name  + "</span>"+ " " +
-					    	"<strong>flow size:</strong> <span style='color:red'>" + d.trees_values[cur_tree_index] + "</span>"+ " " +
-					    	"<strong>depth:</strong> <span style='color:red'>" + d._depth + "</span>";
+					return 	"name: <span style='color:red'>" + d.name  + "</span>"+ " " +
+					    	"flow size: <span style='color:red'>" + d.trees_values[cur_tree_index] + "</span>"+ " " +
+					    	"depth: <span style='color:red'>" + d._depth + "</span>";
 					 });
 
 			svg.call(tip_array[i]);
@@ -1004,6 +1008,84 @@ var radial = function(){
 			var this_width=this.width.animVal.valueInSpecifiedUnits;
 			var this_height=this.height.animVal.valueInSpecifiedUnits;
 			draw_adjust_button();
+
+			function draw_adjust_button()
+			{
+				var rect_attribute_button={	
+					height:50,
+					biasx:this_x+this_width/2,
+					biasy:this_y+this_height,
+					cur_id:"ratio_adjust",
+					button_shape: (	"M" + 0 + "," + 0 + 
+									"L" + -4 + ","+ 12 + 
+									"L" + 4 + ","+ 12 +
+									"L" + 0 + "," + 0),
+					background_color: "black",
+					cur_svg:svg,
+					//mouseclick_function:function(d){
+					//	console.log("!!!")	
+					//},
+				};			
+				creat_button(rect_attribute_button);
+				function creat_button(rect_attribute_button){
+					var width = rect_attribute_button.width;  
+					var height = rect_attribute_button.height; 
+					var biasx=rect_attribute_button.biasx;
+					var biasy=rect_attribute_button.biasy;
+					var background_color=rect_attribute_button.background_color;
+					var mouseover_function=rect_attribute_button.mouseover_function;
+					var mouseout_function=rect_attribute_button.mouseout_function;
+					var mouseclick_function=rect_attribute_button.mouseclick_function;
+					var shown_string=rect_attribute_button.button_string;
+					var font_color=rect_attribute_button.font_color;
+					var font_size=rect_attribute_button.font_size;
+					var cur_id=rect_attribute_button.cur_id;
+					var cur_class=rect_attribute_button.cur_class;
+					var cur_data=rect_attribute_button.cur_data;
+					var cur_button_shape=rect_attribute_button.button_shape;
+					var cur_svg=rect_attribute_button.cur_svg;
+						
+					var tooltip=d3.selectAll("#tooltip");
+					if (typeof(cur_button_shape)=="undefined")
+					{
+						var button = cur_svg.append("rect");
+					}
+					else//自定义按钮形状
+					{
+						var button = cur_svg.append("path")
+									 		.attr("d",cur_button_shape)
+									 		.attr("stroke","black")
+									 		.attr("stroke-width",1);
+					}
+					button.datum(cur_data)//绑定数据以后，后面的function才能接到d，否则只能接到this
+							.on("mouseover",mouseover_function)
+							.on("click",mouseclick_function)
+
+							.on("mouseout",function(){
+								if (typeof(mouseout_function)!="undefined")
+									mouseout_function(this);
+								tooltip.style("opacity",0.0);
+							})
+							.on("mousemove",function(){
+								// 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 
+								tooltip.style("left", (d3.event.pageX) + "px")
+										.style("top", (d3.event.pageY + 20) + "px");
+							})
+							.attr("class","rect_button")
+							.attr("id",cur_id)						
+							.attr("style",	"width:"+width+"px;"+
+											"height:"+height+"px;"+
+											"color:"+font_color+";"+
+											"font-size:"+font_size)
+							.attr("transform",function(d,i){  
+								return "translate(" + (biasx) + "," + (biasy) + ")";  
+							}) 
+							.attr("fill",function(d,i){  
+								return background_color;  
+							});
+				}
+			}
+
 		});
 		draw_link();
 	}
@@ -1236,6 +1318,85 @@ var radial = function(){
 			var this_width=this.width.animVal.valueInSpecifiedUnits;
 			var this_height=this.height.animVal.valueInSpecifiedUnits;
 			draw_adjust_button();
+
+			function draw_adjust_button()
+			{
+				var rect_attribute_button={	
+					height:50,
+					biasx:this_x+this_width/2,
+					biasy:this_y+this_height,
+					cur_id:"ratio_adjust",
+					button_shape: (	"M" + 0 + "," + 0 + 
+									"L" + -6 + ","+ 15 + 
+									"L" + 6 + ","+ 15 +
+									"L" + 0 + "," + 0),
+					background_color: "red",
+					cur_svg:svg,
+					//mouseclick_function:function(d){
+					//	console.log("!!!")	
+					//},
+				};			
+				creat_button(rect_attribute_button);
+				function creat_button(rect_attribute_button){
+					var width = rect_attribute_button.width;  
+					var height = rect_attribute_button.height; 
+					var biasx=rect_attribute_button.biasx;
+					var biasy=rect_attribute_button.biasy;
+					var background_color=rect_attribute_button.background_color;
+					var mouseover_function=rect_attribute_button.mouseover_function;
+					var mouseout_function=rect_attribute_button.mouseout_function;
+					var mouseclick_function=rect_attribute_button.mouseclick_function;
+					var shown_string=rect_attribute_button.button_string;
+					var font_color=rect_attribute_button.font_color;
+					var font_size=rect_attribute_button.font_size;
+					var cur_id=rect_attribute_button.cur_id;
+					var cur_class=rect_attribute_button.cur_class;
+					var cur_data=rect_attribute_button.cur_data;
+					var cur_button_shape=rect_attribute_button.button_shape;
+					var cur_svg=rect_attribute_button.cur_svg;
+						
+					var tooltip=d3.selectAll("#tooltip");
+					if (typeof(cur_button_shape)=="undefined")
+					{
+						var button = cur_svg.append("rect");
+					}
+					else//自定义按钮形状
+					{
+						var button = cur_svg.append("path")
+									 		.attr("d",cur_button_shape)
+									 		.attr("stroke","red")
+									 		.attr("stroke-width",1);
+					}
+					button.datum(cur_data)//绑定数据以后，后面的function才能接到d，否则只能接到this
+							.on("mouseover",mouseover_function)
+							.on("click",mouseclick_function)
+
+							.on("mouseout",function(){
+								if (typeof(mouseout_function)!="undefined")
+									mouseout_function(this);
+								tooltip.style("opacity",0.0);
+							})
+							.on("mousemove",function(){
+								// 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 
+								tooltip.style("left", (d3.event.pageX) + "px")
+										.style("top", (d3.event.pageY + 20) + "px");
+							})
+							.attr("class","rect_button")
+							.attr("id",cur_id)						
+							.attr("style",	"width:"+width+"px;"+
+											"height:"+height+"px;"+
+											"color:"+font_color+";"+
+											"font-size:"+font_size)
+							.attr("transform",function(d,i){  
+								return "translate(" + (biasx) + "," + (biasy) + ")";  
+							}) 
+							.attr("fill",function(d,i){  
+								return background_color;  
+							});
+				}
+			}
+
+
 		});
 		//-------------------------------------------------------------------------------------
 		//-------------------------------------------------------------------------------------
@@ -1272,88 +1433,8 @@ var radial = function(){
 			}
 		}
 	}
-	function draw_adjust_button()
-		{
-			var rect_attribute_button={
-				
-				height:50,
-				biasx:this_x+this_width/2,
-				biasy:this_y+this_height,
-				cur_id:"ratio_adjust",
-				button_shape: (	"M" + 0 + "," + 0 + 
-								"L" + -6 + ","+ 15 + 
-								"L" + 6 + ","+ 15 +
-								"L" + 0 + "," + 0),
-				background_color: "red",
-				cur_svg:svg,
-				//mouseclick_function:function(d){
-				//	console.log("!!!")	
-				//},
-			};			
-			creat_button(rect_attribute_button);
-		}
-		function creat_button(rect_attribute_button){
-			var width = rect_attribute_button.width;  
-			var height = rect_attribute_button.height; 
-			var biasx=rect_attribute_button.biasx;
-			var biasy=rect_attribute_button.biasy;
-			var background_color=rect_attribute_button.background_color;
-			var mouseover_function=rect_attribute_button.mouseover_function;
-			var mouseout_function=rect_attribute_button.mouseout_function;
-			var mouseclick_function=rect_attribute_button.mouseclick_function;
-			var shown_string=rect_attribute_button.button_string;
-			var font_color=rect_attribute_button.font_color;
-			var font_size=rect_attribute_button.font_size;
-			var cur_id=rect_attribute_button.cur_id;
-			var cur_class=rect_attribute_button.cur_class;
-			var cur_data=rect_attribute_button.cur_data;
-			var cur_button_shape=rect_attribute_button.button_shape;
-			var cur_svg=rect_attribute_button.cur_svg;
-			
-			var tooltip=d3.selectAll("#tooltip");
 
-			if (typeof(cur_button_shape)=="undefined")
-			{
-				var button = cur_svg.append("rect");
-			}
-			else//自定义按钮形状
-			{
-				var button = cur_svg.append("path")
-							 		.attr("d",cur_button_shape)
-							 		.attr("stroke","red")
-							 		.attr("stroke-width",1);
-			}
-
-			button.datum(cur_data)//绑定数据以后，后面的function才能接到d，否则只能接到this
-					.on("mouseover",mouseover_function)
-					.on("click",mouseclick_function)
-
-				.on("mouseout",function(){
-						if (typeof(mouseout_function)!="undefined")
-							mouseout_function(this);
-						tooltip.style("opacity",0.0);
-					})
-					.on("mousemove",function(){
-						// 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 
-						tooltip.style("left", (d3.event.pageX) + "px")
-							.style("top", (d3.event.pageY + 20) + "px");
-					})
-					.attr("class","rect_button")
-					.attr("id",cur_id)
-							
-					.attr("style",
-								"width:"+width+"px;"+
-								"height:"+height+"px;"+
-								"color:"+font_color+";"+
-								"font-size:"+font_size
-								)
-					.attr("transform",function(d,i){  
-						return "translate(" + (biasx) + "," + (biasy) + ")";  
-					}) 
-					.attr("fill",function(d,i){  
-						return background_color;  
-					});
-		}
+	
 
 	$("#default").attr("checked",true);
 	$("#radial-depth-controller").unbind().on("click", ".level-btn", function(){
@@ -1376,6 +1457,15 @@ var radial = function(){
 			}
 		}
 		formerDepth = dep;
+
+		for (var i=0;i<tip_array.length;++i){
+			tip_array[i].hide();
+		}
+		for (var i=0;i<maintain_tooltip_display.length;++i)
+		{
+			maintain_tooltip_display[i]=false;
+		}
+
 	});
 	$("#state-change").unbind().click(function(){
 		if($("#state-change").hasClass("active")){
