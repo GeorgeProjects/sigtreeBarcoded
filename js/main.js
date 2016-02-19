@@ -79,9 +79,7 @@ var mainController = function(){
 
                 })
         }
-
     }
-
     initInteractionHandler();
     $.when(loadStatData())
         .done(function() {

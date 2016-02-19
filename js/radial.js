@@ -505,6 +505,9 @@ var radial = function(){
 			console.log(currentDepth);
 			console.log(changeWidthArray);
 			xCompute = 0;
+			curDrawDep = 10;
+			formerNodeRepeat = 0;
+			formerDepth = 0;
 			svg.selectAll('rect')
 			.data(linear_tree)
 				.transition()
@@ -739,6 +742,9 @@ var radial = function(){
 		//----------------------------------------------------------
 		function draw_depth_show(currentDepth,depth){
 			xCompute = 0;
+			curDrawDep = 10;
+			formerNodeRepeat = 0;
+			formerDepth = 0;
 			svg.selectAll('rect')
 			.data(linear_tree)
 			.transition()
@@ -1340,23 +1346,47 @@ var radial = function(){
 	$("#default").attr("checked",true);
 	$("#radial-depth-controller").unbind().on("click", ".level-btn", function(){
 		var dep = $(this).attr("level");
-		shown_depth=dep;
+		shown_depth = dep;
 		$("#radial-depth-controller .level-btn").removeClass("active");		
 		for (var i = 0; i <= dep; i++)
 			$("#radial-depth-controller .level-btn[level=" + i + "]").addClass("active");
 		if(formerDepth < dep){
-			draw_reduce_barcoded_move(linear_tree,formerDepth,dep);
+			if($("#state-change").hasClass("active")){
+				draw_reduce_barcoded_move(linear_tree,formerDepth,dep);
+			}else{
+				draw_barcoded_tree_move(linear_tree,formerDepth,dep);
+			}
 		}else if(formerDepth > dep){
-			draw_reduce_barcoded_depth(linear_tree,formerDepth,dep);
+			if($("#state-change").hasClass("active")){
+				draw_reduce_barcoded_depth(linear_tree,formerDepth,dep);
+			}else{
+				draw_barcoded_tree_depth(linear_tree,formerDepth,dep);
+			}
 		}
 		formerDepth = dep;
 	});
 	$("#state-change").unbind().click(function(){
 		if($("#state-change").hasClass("active")){
+			shown_depth == 0?formerDepth=4:formerDepth=0;
+			console.log("formerDepth:"+formerDepth);
+			console.log("shown_depth:"+shown_depth);
 			draw_barcoded_tree(linear_tree,1);
+			if(formerDepth < shown_depth){
+				draw_reduce_barcoded_move(linear_tree,formerDepth,shown_depth);
+			}else if(formerDepth > shown_depth){
+				draw_reduce_barcoded_depth(linear_tree,formerDepth,shown_depth);
+			}
 			$("#state-change").removeClass("active");
 		}else{
+			shown_depth == 0?formerDepth=4:formerDepth=0;
+			console.log("formerDepth:"+formerDepth);
+			console.log("shown_depth:"+shown_depth);
 			draw_reduce_barcoded_tree(linear_tree,1);
+			if(formerDepth < shown_depth){
+				draw_barcoded_tree_move(linear_tree,formerDepth,shown_depth);
+			}else if(formerDepth > shown_depth){
+				draw_barcoded_tree_depth(linear_tree,formerDepth,shown_depth);
+			}
 			$("#state-change").addClass("active");
 		}
 	});
