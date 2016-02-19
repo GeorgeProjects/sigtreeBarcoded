@@ -726,7 +726,82 @@ var radial = function(){
 		});
 		//-------------------------------------------------------------------------------------
 		//-------------------------------------------------------------------------------------
-		function draw_adjust_button()
+		var beginRadians = Math.PI/2,
+			endRadians = Math.PI * 3/2,
+			points = 50;
+		for(var i = 0;i < linear_tree.length;i++){
+			var fatherWidth =  +svg.select('#bar-id' + i).attr('width');
+			var fatherX = +svg.select('#bar-id' + i).attr('x') + fatherWidth/2;
+			var thisNode = linear_tree[i];
+			var fatherIndex = thisNode.linear_index;
+			var children = thisNode.children;
+			if(children != undefined){
+				for(var j = 0;j < children.length;j++){
+					var child = children[j];
+					var childIndex = child.linear_index;
+					var childWidth = +svg.select('#bar-id' + childIndex).attr('width');
+					var childX = +svg.select('#bar-id' + childIndex).attr('x') + childWidth/2;
+					var radius = (childX - fatherX)/2;
+					var angle = d3.scale.linear()
+				   		.domain([0, points-1])
+				   		.range([beginRadians, endRadians]);
+				   	var line = d3.svg.line.radial()
+				   		.interpolate("basis")
+				   		.tension(0)
+				   		.radius(radius)
+				   		.angle(function(d, i) { return angle(i); });
+					svg.append("path").datum(d3.range(points))
+		    			.attr("class", "line " + "f-" + fatherIndex + " c-" + childIndex)
+		    			.attr('id','path-f' + fatherIndex +'-c-'+ childIndex)
+		    			.attr("d", line)
+		    			.attr("transform", "translate(" + (fatherX + radius) + ", " + (rectY + rectHeight) + ")");
+				}
+			}
+		}
+		/*
+		for (var i=0;i<=5;++i)
+		{
+			var text_x=100;
+			var text_y=100+40*i;
+			if (i!=5)
+				var str = 	"L"+ i + " node number:"+acc_depth_node_num[i];
+			else
+				var str = 	"L0 to L4" + " node number:"+
+							(acc_depth_node_num[0]+acc_depth_node_num[1]+
+							 acc_depth_node_num[2]+acc_depth_node_num[3]+acc_depth_node_num[4]);
+			//draw_text_description(str,text_x,text_y);
+		}
+		//给出text标注每个深度的结点分别有多少个
+		
+		function draw_text_description(str,text_x,text_y)
+		{
+			var text = svg.append("text")
+							.attr("x",30)
+							.attr("y",100)
+							.attr("font-size",20)
+							.attr("font-family","simsun")
+							.attr("position","absolute")
+					.attr("transform",function(d,i){  
+					        return "translate(" + (text_x) + "," + (text_y) + ")";  
+					    });	
+			var strs = str.split("，");
+			
+			console.log(strs);
+								
+			text.selectAll("tspan")
+					.data(strs)
+					.enter()
+					.append("tspan")
+					.attr("x",text.attr("x"))
+					.attr("dy","1em")
+					.text(function(d){
+						return d;
+					});
+		}
+		*/
+	}
+	
+	function draw_adjust_button()
 		{
 			var rect_attribute_button={
 				
@@ -808,82 +883,6 @@ var radial = function(){
 						return background_color;  
 					});
 		}
-		//--------------------------------------------------------------
-		var beginRadians = Math.PI/2,
-			endRadians = Math.PI * 3/2,
-			points = 50;
-		for(var i = 0;i < linear_tree.length;i++){
-			var fatherWidth =  +svg.select('#bar-id' + i).attr('width');
-			var fatherX = +svg.select('#bar-id' + i).attr('x') + fatherWidth/2;
-			var thisNode = linear_tree[i];
-			var fatherIndex = thisNode.linear_index;
-			var children = thisNode.children;
-			if(children != undefined){
-				for(var j = 0;j < children.length;j++){
-					var child = children[j];
-					var childIndex = child.linear_index;
-					var childWidth = +svg.select('#bar-id' + childIndex).attr('width');
-					var childX = +svg.select('#bar-id' + childIndex).attr('x') + childWidth/2;
-					var radius = (childX - fatherX)/2;
-					var angle = d3.scale.linear()
-				   		.domain([0, points-1])
-				   		.range([beginRadians, endRadians]);
-				   	var line = d3.svg.line.radial()
-				   		.interpolate("basis")
-				   		.tension(0)
-				   		.radius(radius)
-				   		.angle(function(d, i) { return angle(i); });
-					svg.append("path").datum(d3.range(points))
-		    			.attr("class", "line " + "f-" + fatherIndex + " c-" + childIndex)
-		    			.attr('id','path-f' + fatherIndex +'-c-'+ childIndex)
-		    			.attr("d", line)
-		    			.attr("transform", "translate(" + (fatherX + radius) + ", " + (rectY + rectHeight) + ")");
-				}
-			}
-		}
-		/*
-		for (var i=0;i<=5;++i)
-		{
-			var text_x=100;
-			var text_y=100+40*i;
-			if (i!=5)
-				var str = 	"L"+ i + " node number:"+acc_depth_node_num[i];
-			else
-				var str = 	"L0 to L4" + " node number:"+
-							(acc_depth_node_num[0]+acc_depth_node_num[1]+
-							 acc_depth_node_num[2]+acc_depth_node_num[3]+acc_depth_node_num[4]);
-			//draw_text_description(str,text_x,text_y);
-		}
-		//给出text标注每个深度的结点分别有多少个
-		
-		function draw_text_description(str,text_x,text_y)
-		{
-			var text = svg.append("text")
-							.attr("x",30)
-							.attr("y",100)
-							.attr("font-size",20)
-							.attr("font-family","simsun")
-							.attr("position","absolute")
-					.attr("transform",function(d,i){  
-					        return "translate(" + (text_x) + "," + (text_y) + ")";  
-					    });	
-			var strs = str.split("，");
-			
-			console.log(strs);
-								
-			text.selectAll("tspan")
-					.data(strs)
-					.enter()
-					.append("tspan")
-					.attr("x",text.attr("x"))
-					.attr("dy","1em")
-					.text(function(d){
-						return d;
-					});
-		}
-		*/
-	}
-	
 	$("#default").attr("checked",true);
 	$("#radial-depth-controller").on("click", ".level-btn", function(){
 		var dep = $(this).attr("level");
