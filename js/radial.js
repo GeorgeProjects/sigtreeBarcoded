@@ -376,6 +376,10 @@ var radial = function(){
 	function draw_barcoded_tree(linear_tree,cur_tree_index)
 	{
 		var svg = d3.select('#radial'); 
+		for (var i=0;i<tip_array.length;++i){
+			tip_array[i].hide();
+		}
+
 		for (var i=0;i<linear_tree.length;++i)
 		{
 			maintain_tooltip_display[i]=false;
@@ -393,9 +397,7 @@ var radial = function(){
 
 			svg.call(tip_array[i]);
 		}
-		for (var i=0;i<tip_array.length;++i){
-			tip_array[i].hide();
-		}
+		
 		xCompute = 0;//用于累积当前方块的横坐标
 		var acc_depth_node_num=[];//记录各个深度的结点数
 		for (var i=0;i<=4;++i){
@@ -519,6 +521,10 @@ var radial = function(){
 	function draw_reduce_barcoded_tree(linear_tree,cur_tree_index)
 	{
 		var svg = d3.select('#radial'); 
+		for (var i=0;i<tip_array.length;++i){
+			tip_array[i].hide();
+		}
+
 		for (var i=0;i<linear_tree.length;++i)
 		{
 			maintain_tooltip_display[i]=false;
@@ -536,9 +542,7 @@ var radial = function(){
 			svg.call(tip_array[i]);
 		}
 
-		for (var i=0;i<tip_array.length;++i){
-			tip_array[i].hide();
-		}
+		
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
 		var barHeight = rectHeight / divideNum * 2;
@@ -775,47 +779,6 @@ var radial = function(){
 				}
 			}
 		}
-		/*
-		for (var i=0;i<=5;++i)
-		{
-			var text_x=100;
-			var text_y=100+40*i;
-			if (i!=5)
-				var str = 	"L"+ i + " node number:"+acc_depth_node_num[i];
-			else
-				var str = 	"L0 to L4" + " node number:"+
-							(acc_depth_node_num[0]+acc_depth_node_num[1]+
-							 acc_depth_node_num[2]+acc_depth_node_num[3]+acc_depth_node_num[4]);
-			//draw_text_description(str,text_x,text_y);
-		}
-		//给出text标注每个深度的结点分别有多少个
-		
-		function draw_text_description(str,text_x,text_y)
-		{
-			var text = svg.append("text")
-							.attr("x",30)
-							.attr("y",100)
-							.attr("font-size",20)
-							.attr("font-family","simsun")
-							.attr("position","absolute")
-					.attr("transform",function(d,i){  
-					        return "translate(" + (text_x) + "," + (text_y) + ")";  
-					    });	
-			var strs = str.split("，");
-			
-			console.log(strs);
-								
-			text.selectAll("tspan")
-					.data(strs)
-					.enter()
-					.append("tspan")
-					.attr("x",text.attr("x"))
-					.attr("dy","1em")
-					.text(function(d){
-						return d;
-					});
-		}
-		*/
 	}
 	
 		function draw_adjust_button()

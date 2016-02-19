@@ -455,6 +455,8 @@ var treeSelect = function(){
 					}
 				}
 
+				console.log(d);
+
 				tip.show(d);
 			})
 			.on("mouseout",function(d,i){
