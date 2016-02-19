@@ -161,7 +161,7 @@ var radial = function(){
 				}
 	        	changePercentage(finalValue);
 	        });
-	    
+
 	    sliderSvg.select("#back-slider").remove();
 	    sliderSvg.select("#slider-g")
 			.append("rect")
@@ -206,8 +206,6 @@ var radial = function(){
 			})
 			.call(drag);
 	}
-	
-	
 	var changeWidthArray = [];
 	for(var i = 0;i < widthArray.length;i++){
 		changeWidthArray[i] = widthArray[i];
@@ -958,7 +956,8 @@ var radial = function(){
 			if(d._father!=undefined){
 				fatherIndex = d._father.linear_index;
 			}
-			return 'bar-class num-' + d._depth + 'father-' + fatherIndex + " num-" + d._depth + ' father-' + fatherIndex;
+			return 'bar-class num-' + d._depth + 'father-' + fatherIndex + " num-" + d._depth + ' father-' + fatherIndex 
+				+ " father-" + fatherIndex + "subtree-" + d.nth_different_subtree;
 		})
 		.attr('id',function(d,i){
 			return  'bar-id' + d.linear_index;
@@ -1014,6 +1013,8 @@ var radial = function(){
 		    	.classed('path-highlight',true);
 		    svg.selectAll('.c-' + thisIndex)
 		    	.classed('father-highlight',true);
+		    svg.selectAll(".father-" + d._father.linear_index + "subtree-" + d.nth_different_subtree)
+		    	.classed("same-sibling",true);
 		    //changed
 		    ObserverManager.post("percentage",[acc_depth_node_num[d._depth]/linear_tree.length , d._depth]);
 		})
@@ -1041,6 +1042,9 @@ var radial = function(){
 
 		    svg.selectAll('path')
 		    	.classed('father-highlight',false);
+
+		    svg.selectAll(".father-" + d._father.linear_index + "subtree-" + d.nth_different_subtree)
+		    	.classed("same-sibling",false);
 
 		    ObserverManager.post("percentage", [0 ,-1]);
 		})
@@ -1159,8 +1163,6 @@ var radial = function(){
 					 });
 			svg.call(tip_array[i]);
 		}
-
-		
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
 		var barHeight = rectHeight / divideNum * 2;
@@ -1190,7 +1192,8 @@ var radial = function(){
 			if(d._father!=undefined){
 				fatherIndex = d._father.linear_index;
 			}
-			return 'bar-class num-' + d._depth + 'father-' + fatherIndex + " num-" + d._depth + ' father-' + fatherIndex;
+			return 'bar-class num-' + d._depth + 'father-' + fatherIndex + " num-" + d._depth + ' father-' + 
+				fatherIndex+ " father-" + fatherIndex + "subtree-" + d.nth_different_subtree;
 		})
 		.attr('id',function(d,i){
 			return  'bar-id' + d.linear_index;
@@ -1324,6 +1327,8 @@ var radial = function(){
 		    	.classed('path-highlight',true);
 		    svg.selectAll('.c-' + thisIndex)
 		    	.classed('father-highlight',true);
+		    svg.selectAll(".father-" + d._father.linear_index + "subtree-" + d.nth_different_subtree)
+		    	.classed("same-sibling",true);
 		    //changed
 		    ObserverManager.post("percentage",[acc_depth_node_num[d._depth]/linear_tree.length , d._depth]);
 		})
@@ -1352,6 +1357,8 @@ var radial = function(){
 		    svg.selectAll('path')
 		    	.classed('father-highlight',false);
 
+		    svg.selectAll(".father-" + d._father.linear_index + "subtree-" + d.nth_different_subtree)
+		    	.classed("same-sibling",false);
 		    ObserverManager.post("percentage", [0 ,-1]);
 		})
 		.on('click',function(d,i){

@@ -97,6 +97,9 @@
   rect[class~=sibiling-highlight]{
     fill:lightblue;
   }
+  rect[class~=same-sibling]{
+    fill:blue; 
+  }
   rect[class~=father-highlight]{
     fill:brown;
   }
