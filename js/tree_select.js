@@ -411,10 +411,20 @@ var treeSelect = function(){
 			.classed(("level-"+level),true)
 
 			.on("mouseover",function(d,i){
+				
 
 				//nodenum模式下，mouseover一段柱子时，高亮barcode中所有对应深度的结点
 				if (datadimMode=="nodenum")
 				{
+					//将之前用对应颜色高亮的一段（那一段一定是变蓝的柱子的一部分）变成current
+					d3.selectAll(".selected_seperate_bar")
+						.classed("selected_seperate_bar", false)
+						.classed("current", true);
+					//用对应颜色高亮当前mouseover的一段
+					d3.select(this)
+						.classed("selected_seperate_bar", true);
+
+
 					var cur_html_element_class=this.className.animVal;
 					//记录当前元素是否是被单击选中过的current元素，是的话为1,否则为0
 					var flag_current = ( cur_html_element_class.indexOf("current") !=-1);
@@ -432,10 +442,14 @@ var treeSelect = function(){
 				tip.show(d);
 			})
 			.on("mouseout",function(d,i){
+				
 
 				//nodenum模式下，mouseout一段柱子时，取消高亮barcode中所有对应深度的结点
 				if (datadimMode=="nodenum")
 				{
+					d3.select(this)
+						.classed("selected_seperate_bar", false);
+
 					var cur_html_element_class=this.className.animVal;
 					//记录当前元素是否是被单击选中过的current元素，是的话为1,否则为0
 					var flag_current = ( cur_html_element_class.indexOf("current") !=-1);
@@ -564,17 +578,27 @@ var treeSelect = function(){
 			else if (datadimMode=="nodenum")
 			{
 				var cur_depth=data[1];
-				var cur_level=9-2*cur_depth;
+				if (cur_depth!=-1)
+				{
+					var cur_level=9-2*cur_depth;
 
-				d3.selectAll(".selected_seperate_bar")
-					.classed("selected_seperate_bar", false)//去红色
-					.classed("current", true);//加蓝色
+					d3.selectAll(".selected_seperate_bar")
+						.classed("selected_seperate_bar", false)//去对应颜色
+						.classed("current", true);//加蓝色
 
-				d3.selectAll(".current" + ".level-"+cur_level)
-					.classed("selected_seperate_bar", true);//加红色
-
-				d3.selectAll(".current" + ".level-"+cur_level)
-					.classed("current", false);//去掉原来的蓝色标记	
+					d3.selectAll(".current" + ".level-"+cur_level)
+						.classed("selected_seperate_bar", true)//加对应颜色
+						.classed("current", false);//去蓝色
+				}
+				else//收到-1表示在barcode上mouseout了
+				{
+					//当鼠标在barcode上mouseout时，
+					//意味着此时在histrogram中变成selected而高亮的只可能是鼠标单击过的bar
+					//所以此时将其class直接退回current
+					d3.selectAll(".selected_seperate_bar")
+						.classed("selected_seperate_bar", false)//去对应颜色
+						.classed("current", true);//加蓝色
+				}
 			}
 	    }
 	    if (message == "show-detail-info") {

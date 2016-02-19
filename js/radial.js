@@ -501,7 +501,7 @@ var radial = function(){
 		    svg.selectAll('path')
 		    	.classed('father-highlight',false);
 
-		    ObserverManager.post("percentage", [0 ,d._depth]);
+		    ObserverManager.post("percentage", [0 ,-1]);
 		})
 		.on('click',function(d,i){
 					//click一下转换hide或保持的状态
@@ -730,7 +730,7 @@ var radial = function(){
 		    svg.selectAll('path')
 		    	.classed('father-highlight',false);
 
-		    ObserverManager.post("percentage", [0 ,d._depth]);
+		    ObserverManager.post("percentage", [0 ,-1]);
 		})
 		.on('click',function(d,i){
 			//click一下转换hide或保持的状态
