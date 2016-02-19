@@ -547,9 +547,6 @@ var radial = function(){
 		var curDrawDep = 10;
 		var formerNodeRepeat = 0;
 		var formerDepth = 0;
-		for(var i=0;i<linear_tree.length;i++){
-			console.log(linear_tree[i].continuous_repeat_time);
-		}
 		console.log(linear_tree);
 		xCompute = 0;//用于累积当前方块的横坐标
 		var acc_depth_node_num=[];//记录各个深度的结点数
