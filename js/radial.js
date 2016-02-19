@@ -56,6 +56,7 @@ var radial = function(){
 
 	reorder_tree(target_root);
 	cal_repeat_time(target_root);
+	cal_nth_different_subtree_traverse(target_root);
 
 	linearlize(target_root,linear_tree);
 	console.log("target_root");
