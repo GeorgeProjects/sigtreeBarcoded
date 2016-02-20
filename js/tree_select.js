@@ -425,8 +425,6 @@ var treeSelect = function(){
 			.classed(("level-"+level),true)
 
 			.on("mouseover",function(d,i){
-				
-
 				//nodenum模式下，mouseover一段柱子时，高亮barcode中所有对应深度的结点
 				if (datadimMode=="nodenum")
 				{

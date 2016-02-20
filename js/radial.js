@@ -76,8 +76,9 @@ var radial = function(){
 
 	
 	var handleColor = ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9"];
-	var dataProcessor = dataCenter.datasets[0].processor;
-	var dataset = dataCenter.datasets[0].processor.result;
+	var treeIndex = dataCenter.datasets.length;
+	var dataProcessor = dataCenter.datasets[treeIndex-1].processor;
+	var dataset = dataCenter.datasets[treeIndex-1].processor.result;
 	var formerDepth = 4;
 	var target_root={//用树结构存储公共树
 		//因为mark=0有特殊含义，所以输入的树的标号不能取0
@@ -103,8 +104,6 @@ var radial = function(){
 	cal_nth_different_subtree_traverse(target_root);
 
 	linearlize(target_root,linear_tree);
-	console.log("target_root");
-	console.log(target_root);
 
 	draw_slide_bar();
 	function draw_slide_bar(){
@@ -193,7 +192,6 @@ var radial = function(){
 			})
 			.on("mouseover",function(d,i){
 				d3.select(this).classed("slider-hover-" + i,true);
-				console.log("i:" + i);
 				var changeClass = "hover-depth-" + i;
 				d3.selectAll(".num-" + i).classed(changeClass,true);
 				changePercentage(widthArray[i]);
@@ -224,12 +222,11 @@ var radial = function(){
 		draw_barcoded_tree_depth(linear_tree,shown_depth,shown_depth);
 		formerDepth = shown_depth;
 	}
-	function draw_barcoded_tree_depth(linear_tree,former_depth,depth){
+	function draw_barcoded_tree_depth(linear_tree,former_depth,depth,treeDes){
 		//按下换depth的button时，要把原来的tip全都删光
 		for (var i=0;i<linear_tree.length;++i)
 			tip_array[i].hide();//hide可以不传参数
 
-		console.log(depth);
 		xCompute = 0;
 		var formerWidthArray = [];
 		var currentDepth = former_depth;
@@ -243,7 +240,7 @@ var radial = function(){
 				changeWidthArray[i] = widthArray[i];
 			}
 		}
-		svg.selectAll('rect')
+		svg.selectAll('.bar-class')
 		.data(linear_tree)
 		.transition()//过渡动画
 			//.duration(500)
@@ -258,6 +255,14 @@ var radial = function(){
 			return rectY;
 		})
 		.attr('width',function(d,i){
+			console.log("--------");
+			console.log(d);
+			console.log(d.route);
+			var route = d.route;
+			var compareRoute = route.substring(0,treeDes.length);
+			if(treeDes == compareRoute){
+				return 0;
+			}
 			return changeWidthArray[d._depth];
 		})
 		.attr('height',function(d,i){
@@ -267,10 +272,8 @@ var radial = function(){
 			draw_depth_move(currentDepth,depth);
 		});
 		function draw_depth_move(currentDepth,depth){
-			console.log(currentDepth);
-			console.log(changeWidthArray);
 			xCompute = 0;
-			svg.selectAll('rect')
+			svg.selectAll('.bar-class')
 			.data(linear_tree)
 			.transition()
 			.attr('x',function(d,i){
@@ -307,7 +310,6 @@ var radial = function(){
 	function draw_barcoded_tree_move(linear_tree,former_depth,depth){
 		xCompute = 0;
 		var formerWidthArray = [];
-		console.log("former_depth:"+former_depth+"depth:"+depth);
 		former_depth = +former_depth;
 		var currentDepth = former_depth;
 		for(var i = 0;i < changeWidthArray.length;i++){
@@ -320,7 +322,7 @@ var radial = function(){
 				changeWidthArray[i] = widthArray[i];
 			}
 		}
-		svg.selectAll('rect')
+		svg.selectAll('.bar-class')
 		.data(linear_tree)
 		.transition()
 		.attr('x',function(d,i){
@@ -345,7 +347,7 @@ var radial = function(){
 		//----------------------------------------------------------
 		function draw_depth_show(currentDepth,depth){
 			xCompute = 0;
-			svg.selectAll('rect')
+			svg.selectAll('.bar-class')
 			.data(linear_tree)
 			.transition()
 			.attr('x',function(d,i){
@@ -426,8 +428,6 @@ var radial = function(){
 	var g;
 	//标记每个元素的tooltip在mouseout时是隐去还是保持
 	function draw_reduce_barcoded_depth(linear_tree,former_depth,depth){
-		
-
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
 		var barHeight = rectHeight / divideNum * 2;
@@ -436,13 +436,11 @@ var radial = function(){
 		var curDrawDep = 10;
 		var formerNodeRepeat = 0;
 		var formerDepth = 0;
-		console.log(linear_tree);
 		xCompute = 0;//用于累积当前方块的横坐标
 		//按下换depth的button时，要把原来的tip全都删光
 		for (var i=0;i<linear_tree.length;++i)
 			tip_array[i].hide();//hide可以不传参数
 
-		console.log(depth);
 		xCompute = 0;
 		var formerWidthArray = [];
 		var currentDepth = former_depth;
@@ -456,7 +454,7 @@ var radial = function(){
 				changeWidthArray[i] = widthArray[i];
 			}
 		}
-		svg.selectAll('rect')
+		svg.selectAll('.bar-class')
 		.data(linear_tree)
 		.transition()//过渡动画
 			//.duration(500)
@@ -555,13 +553,11 @@ var radial = function(){
 			draw_depth_move(currentDepth,depth);
 		});
 		function draw_depth_move(currentDepth,depth){
-			console.log(currentDepth);
-			console.log(changeWidthArray);
 			xCompute = 0;
 			curDrawDep = 10;
 			formerNodeRepeat = 0;
 			formerDepth = 0;
-			svg.selectAll('rect')
+			svg.selectAll('.bar-class')
 			.data(linear_tree)
 				.transition()
 			.attr('x',function(d,i){
@@ -670,8 +666,6 @@ var radial = function(){
 	}
 	//---------------------------------------------------------------------------
 	function draw_reduce_barcoded_move(linear_tree,former_depth,depth){
-		
-
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
 		var barHeight = rectHeight / divideNum * 2;
@@ -680,14 +674,11 @@ var radial = function(){
 		var curDrawDep = 10;
 		var formerNodeRepeat = 0;
 		var formerDepth = 0;
-		console.log(linear_tree);
 		xCompute = 0;//用于累积当前方块的横坐标
 
 		var formerWidthArray = [];
-		console.log("former_depth:"+former_depth+"depth:"+depth);
 		former_depth = +former_depth;
 		var currentDepth = former_depth;
-		console.log("currentDepth:" + currentDepth);
 		for(var i = 0;i < changeWidthArray.length;i++){
 			formerWidthArray[i] = changeWidthArray[i];
 		}
@@ -698,7 +689,7 @@ var radial = function(){
 				changeWidthArray[i] = widthArray[i];
 			}
 		}
-		svg.selectAll('rect')
+		svg.selectAll('.bar-class')
 		.data(linear_tree)
 		.transition()
 		.attr('x',function(d,i){
@@ -801,7 +792,7 @@ var radial = function(){
 			curDrawDep = 10;
 			formerNodeRepeat = 0;
 			formerDepth = 0;
-			svg.selectAll('rect')
+			svg.selectAll('.bar-class')
 			.data(linear_tree)
 			.transition()
 			.attr('x',function(d,i){
@@ -1013,8 +1004,10 @@ var radial = function(){
 		    	.classed('path-highlight',true);
 		    svg.selectAll('.c-' + thisIndex)
 		    	.classed('father-highlight',true);
-		    svg.selectAll(".father-" + d._father.linear_index + "subtree-" + d.nth_different_subtree)
-		    	.classed("same-sibling",true);
+		    if(d._father!=undefined){
+		    	svg.selectAll(".father-" + d._father.linear_index + "subtree-" + d.nth_different_subtree)
+		    		.classed("same-sibling",true);
+		    } 
 		    //changed
 		    ObserverManager.post("percentage",[acc_depth_node_num[d._depth]/linear_tree.length , d._depth]);
 		})
@@ -1042,10 +1035,10 @@ var radial = function(){
 
 		    svg.selectAll('path')
 		    	.classed('father-highlight',false);
-
-		    svg.selectAll(".father-" + d._father.linear_index + "subtree-" + d.nth_different_subtree)
-		    	.classed("same-sibling",false);
-
+		    if(d._father!=undefined){
+		    	svg.selectAll(".father-" + d._father.linear_index + "subtree-" + d.nth_different_subtree)
+		    		.classed("same-sibling",false);
+		    }
 		    ObserverManager.post("percentage", [0 ,-1]);
 		})
 		.on('click',function(d,i){
@@ -1133,7 +1126,7 @@ var radial = function(){
 							});
 				}
 			}
-
+			draw_barcoded_tree_depth(linear_tree,4,4,d.route);
 		});
 		draw_link();
 	}
@@ -1171,7 +1164,6 @@ var radial = function(){
 		var curDrawDep = 10;
 		var formerNodeRepeat = 0;
 		var formerDepth = 0;
-		console.log(linear_tree);
 		xCompute = 0;//用于累积当前方块的横坐标
 		var acc_depth_node_num=[];//记录各个深度的结点数
 		for (var i=0;i<=4;++i){

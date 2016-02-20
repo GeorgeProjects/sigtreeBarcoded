@@ -32,23 +32,22 @@ var mainController = function(){
     function initInteractionHandler() {
         ObserverManager.addListener(this);
     }
-
+    dataCenter.datasets = [];
     this.OMListen = function(message, data) {
         if (message == "changeData") {
             var justChangeDataA = false;
             if (data[1] == datasetID[1])
                 justChangeDataA = true;
             datasetID = _.clone(data);
-            dataCenter.datasets = [];
             var defers = [];
-            for (var i = data.length - 1; i >= 0; i--) {
+            for (var i = data.length - 1; i > 0; i--) {
                 var id = data[i];
                 var processor = new sigtree.dataProcessor();
                 var dataset = {
                     id: id,
                     processor: processor
                 }
-                dataCenter.datasets.push(dataset)
+                dataCenter.datasets.push(dataset);
                 var file = dataCenter.stats[id].file;
                 file = "data/" + file;
                 defers.push(dataset.processor.loadData(file));
