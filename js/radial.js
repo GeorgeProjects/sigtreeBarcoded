@@ -14,6 +14,48 @@ var sliderSvg = d3.select("#slider-view")
 	.attr("width",sliderDivWidth)
 	.attr("height",sliderDivHeight);
 
+
+//画每个barcode背后的rect
+function draw_background_rect()
+{
+	svg//.select("#radial")
+			.selectAll('.background_rect')
+			.data([0,1,2,3,4])
+			.enter()
+			.append('rect')
+		/*
+			.attr('class',function(d,i){
+				var fatherIndex = -1;
+				if(d._father!=undefined){
+					fatherIndex = d._father.linear_index;
+				}
+				return 'bar-class num-' + d._depth + 'father-' + fatherIndex + " num-" + d._depth + ' father-' + fatherIndex;
+			})
+			.attr('id',function(d,i){
+				return  'bar-id' + d.linear_index;
+			})
+	*/
+		.attr('x',function(d,i){
+			/*
+			var backXCompute = xCompute;
+			xCompute = xCompute + widthArray[d._depth] + 1;//两个节点之间空1px
+			return backXCompute;
+			*/
+			return 0;
+		})
+		.attr('y',function(d,i){
+			return i*100;
+		})
+		.attr('width',function(d,i){
+			return 1000;
+		})
+		.attr('height',function(d,i){
+			return 50;
+		})
+		.attr('fill','black');
+}
+
+
 //barcode的tip
 var tip_array=[];
 
@@ -31,6 +73,8 @@ var radial = function(){
 	var Radial = {};
 	ObserverManager.addListener(Radial);
 
+
+	
 	var handleColor = ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9"];
 	var dataProcessor = dataCenter.datasets[0].processor;
 	var dataset = dataCenter.datasets[0].processor.result;
@@ -904,8 +948,8 @@ var radial = function(){
 			acc_depth_node_num[linear_tree[i]._depth]=acc_depth_node_num[linear_tree[i]._depth]+1;
 		}
 		console.log(linear_tree);
-		d3.select("#radial").selectAll("*").remove();
-		svg.selectAll('.bar')
+		d3.select("#radial").selectAll(".bar-class").remove();
+		svg.selectAll('.bar-class')
 		.data(linear_tree)
 		.enter()
 		.append('rect')
@@ -1136,8 +1180,8 @@ var radial = function(){
 		{
 			acc_depth_node_num[linear_tree[i]._depth]=acc_depth_node_num[linear_tree[i]._depth]+1;
 		}
-		d3.select("#radial").selectAll("*").remove();
-		svg.selectAll('.bar')
+		d3.select("#radial").selectAll(".bar-class").remove();
+		svg.selectAll('.bar-class')
 		.data(linear_tree)
 		.enter()
 		.append('rect')

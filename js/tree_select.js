@@ -41,7 +41,7 @@ var treeSelect = function(){
 			var aL3Node=d.L3Node;
 			var aL4Node=d.L4Node;
 
-			if (typeof(aL0Node)!="undefined")
+			if (datadimMode == "nodenum")
 			{
 				return 	"date: " + "<span style='color:red'>" + aTime + "</span>" + " " +
 						"sumNode: " + "<span style='color:red'>" + aValue + "</span>" + " " +
@@ -51,19 +51,10 @@ var treeSelect = function(){
 						"L3Node: " + "<span style='color:red'>" + aL3Node + "</span>" + " " +
 						"L4Node: " + "<span style='color:red'>" + aL4Node ;
 			}
-			else/*
-"date:" + "<span style='color:red'>" + aTime + "</span>" + " " +
-													"sumNode:" + "<span style='color:red'>" + aValue + "</span>" + " " +
-													"L0Node:" + "<span style='color:red'>" + aL0Node + "</span>" + " " +
-													"L1Node:" + "<span style='color:red'>" + aL1Node + "</span>" + " " +
-													"L2Node:" + "<span style='color:red'>" + aL2Node + "</span>" + " " +
-													"L3Node:" + "<span style='color:red'>" + aL3Node + "</span>" + " " +
-													"L4Node:" + "<span style='color:red'>" + aL4Node + "</span>"
-				*/
+			else
 			{
-				return "<span style='font-size:12px;'>	date:" + aTime +
-													"	values:" + aValue +
-													"</span>";
+				return 	"date: " + "<span style='color:red'>" + aTime + "</span>" + " " +
+						"value: " + "<span style='color:red'>" + aValue ;
 			}
 		});
 	var hisWidth = 0;

@@ -243,7 +243,7 @@
 		//cur_node_layer0是人为添加的结点
 		var cur_node_layer0=init_root;
 
-		cur_node_layer0.route="route"+"r";//
+		cur_node_layer0.route="route"+"r";
 
 		//记录所有的tree在该结点处的值
 		var layer0_trees_values=[];
@@ -253,7 +253,7 @@
 			//cur_node_layer1是一个SPE层节点
 			var cur_node_layer1=cur_node_layer0.children[i];
 			//cur_node_layer1.route="route"+String(i);
-			cur_node_layer1.route="route"+"r"+String(i);//
+			cur_node_layer1.route="route"+"r"+String(i);
 
 			//记录所有的tree在该结点处的值
 			var layer1_trees_values=[];
@@ -262,8 +262,7 @@
 			{
 				//cur_node_layer2是一个AAL层节点
 				var cur_node_layer2=cur_node_layer1.children[j];
-				//cur_node_layer2.route="route"+String(i)+"_"+String(j);
-				cur_node_layer2.route="route"+"r"+String(i)+"_"+String(j);//
+				cur_node_layer2.route="route"+"r"+String(i)+"_"+String(j);
 
 				//记录所有的tree在该结点处的值
 				var layer2_trees_values=[];
@@ -272,8 +271,7 @@
 				{
 					//cur_node_layer3是一个VPI层节点
 					var cur_node_layer3=cur_node_layer2.children[k];
-					//cur_node_layer3.route="route"+String(i)+"_"+String(j)+"_"+String(k);
-					cur_node_layer3.route="route"+"r"+String(i)+"_"+String(j)+"_"+String(k);//
+					cur_node_layer3.route="route"+"r"+String(i)+"_"+String(j)+"_"+String(k);
 
 					//记录所有的tree在该结点处的值
 					var layer3_trees_values=[];
@@ -283,8 +281,7 @@
 						//cur_node_layer4是一个CID层节点
 						//CID层是叶子层
 						var cur_node_layer4=cur_node_layer3.children[l];
-						//cur_node_layer4.route="route"+String(i)+"_"+String(j)+"_"+String(k)+"_"+String(l);
-						cur_node_layer4.route="route"+"r"+String(i)+"_"+String(j)+"_"+String(k)+"_"+String(l);//
+						cur_node_layer4.route="route"+"r"+String(i)+"_"+String(j)+"_"+String(k)+"_"+String(l);
 
 						//对每个被合并的树提供的值进行循环
 						//cur_node_layer4.trees_values.length是被合并的树的数量上限
@@ -439,17 +436,12 @@ function cal_repeat_time(root)
 	cal_repeat_time_traverse(root);
 	function cal_repeat_time_traverse(root)
 	{
-		//标记当前的子树是其父下的第n种不同的子树
-		//var acc_nth_different_subtree=1;
-
 		if (typeof(root)=="undefined")
 			return;
 
 		if (typeof(root._father)=="undefined")
 		{
 			root.continuous_repeat_time=1;
-
-			//root.nth_different_subtree=acc_nth_different_subtree;
 		}
 		else
 		{
@@ -467,7 +459,6 @@ function cal_repeat_time(root)
 			}
 			var count_continuous_same_subtree=1;
 
-			//var flag_exist_equal_former_sibling=0;
 			for (var i=root_index-1;i>=0;--i)
 			{
 				var cur_sibling=root_sibling_group[i];
@@ -475,19 +466,11 @@ function cal_repeat_time(root)
 				if (is_equal)//如果相等
 				{
 					count_continuous_same_subtree=count_continuous_same_subtree+1;
-					//flag_exist_equal_former_sibling=1;
 				}
 				else
 					break;
 			}
 			root.continuous_repeat_time=count_continuous_same_subtree;
-
-			//if (!flag_exist_equal_former_sibling)
-			//{
-			//	acc_nth_different_subtree=acc_nth_different_subtree+1;
-			//}
-			//root.nth_different_subtree=acc_nth_different_subtree;
-
 		}
 
 
