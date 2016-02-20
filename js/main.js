@@ -39,6 +39,10 @@ var mainController = function(){
             if (data[1] == datasetID[1])
                 justChangeDataA = true;
             datasetID = _.clone(data);
+<<<<<<< f538b9f4141bd76114980048aa7caa4d9ed39dc4
+=======
+            
+>>>>>>> 424bd51b50cdc8f75b74edda52006159e89a73f8
             var defers = [];
             for (var i = data.length - 1; i > 0; i--) {
                 var id = data[i];
