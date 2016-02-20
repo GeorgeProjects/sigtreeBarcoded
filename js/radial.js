@@ -255,13 +255,12 @@ var radial = function(){
 			return rectY;
 		})
 		.attr('width',function(d,i){
-			console.log("--------");
-			console.log(d);
-			console.log(d.route);
-			var route = d.route;
-			var compareRoute = route.substring(0,treeDes.length);
-			if(treeDes == compareRoute){
-				return 0;
+			if(treeDes!=undefined){
+				var route = d.route;
+				var compareRoute = route.substring(0,treeDes.length);
+				if(treeDes == compareRoute && treeDes.length != route.length){
+					return 0;
+				}
 			}
 			return changeWidthArray[d._depth];
 		})
@@ -287,6 +286,13 @@ var radial = function(){
 				return rectY;
 			})
 			.attr('width',function(d,i){
+				if(treeDes!=undefined){
+					var route = d.route;
+					var compareRoute = route.substring(0,treeDes.length);
+					if(treeDes == compareRoute && treeDes.length != route.length){
+						return 0;
+					}
+				}
 				return changeWidthArray[d._depth];
 			})
 			.attr('height',function(d,i){
@@ -947,7 +953,7 @@ var radial = function(){
 			if(d._father!=undefined){
 				fatherIndex = d._father.linear_index;
 			}
-			return 'bar-class num-' + d._depth + 'father-' + fatherIndex + " num-" + d._depth + ' father-' + fatherIndex 
+			return 'bar bar-class num-' + d._depth + 'father-' + fatherIndex + " num-" + d._depth + ' father-' + fatherIndex 
 				+ " father-" + fatherIndex + "subtree-" + d.nth_different_subtree;
 		})
 		.attr('id',function(d,i){
