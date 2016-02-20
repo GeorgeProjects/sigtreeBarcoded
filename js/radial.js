@@ -16,10 +16,14 @@ var sliderSvg = d3.select("#slider-view")
 
 
 //画每个barcode背后的rect
+draw_background_rect();
 function draw_background_rect()
 {
-	svg//.select("#radial")
-			.selectAll('.background_rect')
+	var svg_height = height;
+	var svg_width = width;
+	var vertical_interval=10;
+
+	svg.selectAll('.background_rect')
 			.data([0,1,2,3,4])
 			.enter()
 			.append('rect')
@@ -44,15 +48,16 @@ function draw_background_rect()
 			return 0;
 		})
 		.attr('y',function(d,i){
-			return i*100;
+			return vertical_interval+svg_height/5*i;//(svg_height-vertical_interval)/5*i+vertical_interval;//i*100;
 		})
 		.attr('width',function(d,i){
-			return 1000;
+			return svg_width;
 		})
 		.attr('height',function(d,i){
-			return 50;
+			return (svg_height-6*vertical_interval)/5;
 		})
-		.attr('fill','black');
+		.attr('fill','grey')
+		.attr("opacity","0.1");
 }
 
 

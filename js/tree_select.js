@@ -1,7 +1,6 @@
 var treeSelect = function(){
 	var SelectTree = {};
 	ObserverManager.addListener(SelectTree);	
-	console.log("Listeners",ObserverManager.getListeners().length);
 	var svgWidth = $("#innerTopLeft").width();
 	var svgHeight = $("#innerTopLeft").height() * 19/20;
 	var compareArray = [0,1];
@@ -376,9 +375,6 @@ var treeSelect = function(){
 						result = height - yScale(Math.log(d.L0Node)) + 1+bias;
 					else if (level==9)
 						result = height - yScale(Math.log(d.L0Node)) + bias;
-	
-					if (result <= 0 )
-						console.log (result,level,height,yScale(Math.log(d.L0Node)));
 
 					return result;
 				}
@@ -450,9 +446,6 @@ var treeSelect = function(){
 							ObserverManager.post("treeselectsend_radialreceive_highlight",cur_depth);
 					}
 				}
-
-				//console.log(d);
-
 				tip.show(d);
 			})
 			.on("mouseout",function(d,i){
@@ -480,25 +473,20 @@ var treeSelect = function(){
 
 				tip.hide(d);
 			})
-			.on('click',function(d,i){
-				
-				
-				
+			.on('click',function(d,i){	
 				var selectedID = +d.index;
-				console.log(selectedID)
 
 				if (compareArray.indexOf(selectedID) < 0){
-					//compareArray[0] = compareArray[1];
 					if(changeA){
 						compareArray[1] = selectedID; 
 					}else{
 						compareArray[0] = selectedID; 
 					}
 				} 
-				else {
-					var index = compareArray.indexOf(/*selectId*/selectedID);
-					compareArray.splice(index,1);
-				}
+				//else {
+				//	var index = compareArray.indexOf(/*selectId*/selectedID);
+				//	compareArray.splice(index,1);
+				//}
 
 				compareNum = selectedID;
 
@@ -541,12 +529,11 @@ var treeSelect = function(){
 				.attr("x", x)
 				.attr("y", y)
 				.text("A");
-
-			//console.log(dataList);
 			$("#innerTopRight #label-A .date_description").html(function() {
 				if (compareArray.length > 0) 
 				{
-					console.log(dataList)
+					//console.log(compareArray);
+					//console.log(dataList);
 					var timeArray = dataList[compareArray[1]].time.split("-");
 					return timeArray[0];
 				}
