@@ -453,7 +453,7 @@ var treeSelect = function(){
 					}
 				}
 
-				console.log(d);
+				//console.log(d);
 
 				tip.show(d);
 			})
@@ -483,10 +483,12 @@ var treeSelect = function(){
 				tip.hide(d);
 			})
 			.on('click',function(d,i){
-				/*
-				var selectedID = +d.index;*/
+				
+				
 				
 				var selectedID = +d.index;
+				console.log(selectedID)
+
 				if (compareArray.indexOf(selectedID) < 0){
 					//compareArray[0] = compareArray[1];
 					if(changeA){
@@ -496,7 +498,7 @@ var treeSelect = function(){
 					}
 				} 
 				else {
-					var index = compareArray.indexOf(selectId);
+					var index = compareArray.indexOf(/*selectId*/selectedID);
 					compareArray.splice(index,1);
 				}
 
@@ -542,10 +544,11 @@ var treeSelect = function(){
 				.attr("y", y)
 				.text("A");
 
-			console.log(dataList);
+			//console.log(dataList);
 			$("#innerTopRight #label-A .date_description").html(function() {
 				if (compareArray.length > 0) 
 				{
+					console.log(dataList)
 					var timeArray = dataList[compareArray[1]].time.split("-");
 					return timeArray[0];
 				}
