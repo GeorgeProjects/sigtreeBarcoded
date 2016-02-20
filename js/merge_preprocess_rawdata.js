@@ -243,6 +243,8 @@
 		//cur_node_layer0是人为添加的结点
 		var cur_node_layer0=init_root;
 
+		cur_node_layer0.route="route"+"r";//
+
 		//记录所有的tree在该结点处的值
 		var layer0_trees_values=[];
 
@@ -250,7 +252,8 @@
 		{
 			//cur_node_layer1是一个SPE层节点
 			var cur_node_layer1=cur_node_layer0.children[i];
-			cur_node_layer1.route="route"+String(i);
+			//cur_node_layer1.route="route"+String(i);
+			cur_node_layer1.route="route"+"r"+String(i);//
 
 			//记录所有的tree在该结点处的值
 			var layer1_trees_values=[];
@@ -259,7 +262,8 @@
 			{
 				//cur_node_layer2是一个AAL层节点
 				var cur_node_layer2=cur_node_layer1.children[j];
-				cur_node_layer2.route="route"+String(i)+"_"+String(j);
+				//cur_node_layer2.route="route"+String(i)+"_"+String(j);
+				cur_node_layer2.route="route"+"r"+String(i)+"_"+String(j);//
 
 				//记录所有的tree在该结点处的值
 				var layer2_trees_values=[];
@@ -268,7 +272,8 @@
 				{
 					//cur_node_layer3是一个VPI层节点
 					var cur_node_layer3=cur_node_layer2.children[k];
-					cur_node_layer3.route="route"+String(i)+"_"+String(j)+"_"+String(k);
+					//cur_node_layer3.route="route"+String(i)+"_"+String(j)+"_"+String(k);
+					cur_node_layer3.route="route"+"r"+String(i)+"_"+String(j)+"_"+String(k);//
 
 					//记录所有的tree在该结点处的值
 					var layer3_trees_values=[];
@@ -278,7 +283,8 @@
 						//cur_node_layer4是一个CID层节点
 						//CID层是叶子层
 						var cur_node_layer4=cur_node_layer3.children[l];
-						cur_node_layer4.route="route"+String(i)+"_"+String(j)+"_"+String(k)+"_"+String(l);
+						//cur_node_layer4.route="route"+String(i)+"_"+String(j)+"_"+String(k)+"_"+String(l);
+						cur_node_layer4.route="route"+"r"+String(i)+"_"+String(j)+"_"+String(k)+"_"+String(l);//
 
 						//对每个被合并的树提供的值进行循环
 						//cur_node_layer4.trees_values.length是被合并的树的数量上限
