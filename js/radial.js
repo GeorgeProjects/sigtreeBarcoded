@@ -14,7 +14,6 @@ var sliderSvg = d3.select("#slider-view")
 	.attr("width",sliderDivWidth)
 	.attr("height",sliderDivHeight);
 
-
 //画每个barcode背后的rect
 draw_background_rect();
 function draw_background_rect()
@@ -59,8 +58,6 @@ function draw_background_rect()
 		.attr('fill','grey')
 		.attr("opacity","0.1");
 }
-
-
 //barcode的tip
 var tip_array=[];
 
@@ -78,8 +75,6 @@ var radial = function(){
 	var Radial = {};
 	ObserverManager.addListener(Radial);
 
-
-	
 	var handleColor = ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9"];
 	var treeIndex = dataCenter.datasets.length;
 	var dataProcessor = dataCenter.datasets[treeIndex-1].processor;
@@ -237,6 +232,7 @@ var radial = function(){
 	//以及当前希望收缩的那一个子树的根treeDes以后，通过动画切换控制显示的数据的转换
 	//此时需要先让深度过大的结点消失；再让其他节点移动，把因为消失而产生的空白补掉
 	function draw_barcoded_tree_depth(linear_tree,former_depth,depth,treeDes){
+		console.log("treeDes:" + treeDes);
 		//按下换depth的button时，要把原来的tip全都删光
 		for (var i=0;i<linear_tree.length;++i)
 			tip_array[i].hide();//hide可以不传参数
@@ -247,10 +243,16 @@ var radial = function(){
 		for(var i = 0;i < changeWidthArray.length;i++){
 			formerWidthArray[i] = changeWidthArray[i];
 		}
-		for(var i = 0; i < widthArray.length; i++){
-			if(i > currentDepth){
-				changeWidthArray[i] = 0;
-			}else{
+		if(treeDes == undefined){
+			for(var i = 0; i < widthArray.length; i++){
+				if(i > currentDepth){
+					changeWidthArray[i] = 0;
+				}else{
+					changeWidthArray[i] = widthArray[i];
+				}
+			}
+		}else{
+			for(var i = 0; i < widthArray.length; i++){
 				changeWidthArray[i] = widthArray[i];
 			}
 		}
@@ -260,6 +262,14 @@ var radial = function(){
 			//.duration(500)
 		.attr('x',function(d,i){
 			var backXCompute = xCompute;
+			if(treeDes!=undefined){
+			var route = d.route;
+				var compareRoute = route.substring(0,treeDes.length);
+				//console.log("compareRoute:" + compareRoute + "treeDes:" + treeDes);
+				if((treeDes == compareRoute) && (treeDes.length != route.length) && (d._depth >= currentDepth)){
+					return backXCompute;
+				}
+			}
 			if(formerWidthArray[d._depth]!=0){
 				xCompute = xCompute + formerWidthArray[d._depth] + 1;
 			}
@@ -272,8 +282,10 @@ var radial = function(){
 			if(treeDes!=undefined){
 				var route = d.route;
 				var compareRoute = route.substring(0,treeDes.length);
-				if(treeDes == compareRoute && treeDes.length != route.length){
+				//console.log("compareRoute:" + compareRoute + "treeDes:" + treeDes);
+				if((treeDes == compareRoute) && (treeDes.length != route.length) && (d._depth >= currentDepth)){
 					return 0;
+					console.log("compareRoute:" + compareRoute + "treeDes:" + treeDes);
 				}
 			}
 			return changeWidthArray[d._depth];
@@ -282,15 +294,23 @@ var radial = function(){
 			return rectHeight;
 		})
 		.call(endall, function() { 
-			draw_depth_move(currentDepth,depth);
+			draw_depth_move(currentDepth,depth,treeDes);
 		});
-		function draw_depth_move(currentDepth,depth){
+		function draw_depth_move(currentDepth,depth,treeDes){
 			xCompute = 0;
 			svg.selectAll('.bar-class')
 			.data(linear_tree)
 			.transition()
 			.attr('x',function(d,i){
 				var backXCompute = xCompute;
+				if(treeDes!=undefined){
+					var route = d.route;
+					var compareRoute = route.substring(0,treeDes.length);
+					//console.log("compareRoute:" + compareRoute + "treeDes:" + treeDes);
+					if((treeDes == compareRoute) && (treeDes.length != route.length) && (d._depth >= currentDepth)){
+						return backXCompute;
+					}
+				}
 				if(changeWidthArray[d._depth]!=0){
 					xCompute = xCompute + changeWidthArray[d._depth] + 1;//两个节点之间空1px
 				}
@@ -303,8 +323,10 @@ var radial = function(){
 				if(treeDes!=undefined){
 					var route = d.route;
 					var compareRoute = route.substring(0,treeDes.length);
-					if(treeDes == compareRoute && treeDes.length != route.length){
+					//console.log("compareRoute:" + compareRoute + "treeDes:" + treeDes);
+					if((treeDes == compareRoute) && (treeDes.length != route.length) && (d._depth >= currentDepth)){
 						return 0;
+						console.log("compareRoute:" + compareRoute + "treeDes:" + treeDes);
 					}
 				}
 				return changeWidthArray[d._depth];
@@ -320,7 +342,7 @@ var radial = function(){
 					draw_link(); 
 				}else{
 					currentDepth = currentDepth - 1;
-					draw_barcoded_tree_depth(linear_tree,currentDepth,depth)
+					draw_barcoded_tree_depth(linear_tree,currentDepth,depth,treeDes)
 				}
 			});
 		} 
@@ -490,7 +512,7 @@ var radial = function(){
 		.transition()//过渡动画
 			//.duration(500)
 		.attr('x',function(d,i){
-						//将这一节点的重复次数变成数字类型，便于以后进行处理
+			//将这一节点的重复次数变成数字类型，便于以后进行处理
 			var repeatTime = +d.continuous_repeat_time;
 			//只有节点的重复次数大于1才会将这个节点进行记录下来，而d._depth <= curDrawDep表示的是所记录下的节点不会被其不重要的字节点覆盖
 			if(d.continuous_repeat_time > 1 && d._depth <= curDrawDep){
@@ -501,12 +523,13 @@ var radial = function(){
 			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
 				curDrawDep = 10;
 				if((formerNodeRepeat - 1)%rowNum != 0){
-					xCompute = xCompute + 2 * widthArray[d._depth] + 1;
+					xCompute = xCompute + widthArray[formerDepth] + 1;
 				}
-			}
-			//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
-			if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
-				xCompute = xCompute + widthArray[d._depth]/3 + 1;
+			}else{
+				//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
+				if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+					xCompute = xCompute + widthArray[formerDepth] + 1;
+				}
 			}
 			//下面是对于绘制的节点的x位置进行计算
 			var backXCompute = xCompute;
@@ -603,12 +626,13 @@ var radial = function(){
 				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
 					curDrawDep = 10;
 					if((formerNodeRepeat - 1)%rowNum != 0){
-						xCompute = xCompute + 2 * changeWidthArray[d._depth] + 1;
+						xCompute = xCompute + changeWidthArray[formerDepth] + 1;
 					}
-				}
-				//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
-				if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
-					xCompute = xCompute + changeWidthArray[d._depth]/3 + 1;
+				}else{
+					//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
+					if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+						xCompute = xCompute + changeWidthArray[formerDepth] + 1;
+					}
 				}
 				//下面是对于绘制的节点的x位置进行计算
 				var backXCompute = xCompute;
@@ -741,12 +765,13 @@ var radial = function(){
 			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
 				curDrawDep = 10;
 				if((formerNodeRepeat - 1)%rowNum != 0){
-					xCompute = xCompute + 2 * changeWidthArray[d._depth] + 1;
+					xCompute = xCompute + changeWidthArray[formerDepth] + 1;
 				}
-			}
-			//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
-			if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
-				xCompute = xCompute + changeWidthArray[d._depth]/3 + 1;
+			}else{
+				//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
+				if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+					xCompute = xCompute + changeWidthArray[formerDepth] + 1;
+				}
 			}
 			//下面是对于绘制的节点的x位置进行计算
 			var backXCompute = xCompute;
@@ -844,12 +869,13 @@ var radial = function(){
 				if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
 					curDrawDep = 10;
 					if((formerNodeRepeat - 1)%rowNum != 0){
-						xCompute = xCompute + 2 * changeWidthArray[d._depth] + 1;
+						xCompute = xCompute + changeWidthArray[formerDepth] + 1;
 					}
-				}
-				//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
-				if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
-					xCompute = xCompute + changeWidthArray[d._depth]/3 + 1;
+				}else{
+					//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
+					if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+						xCompute = xCompute + changeWidthArray[formerDepth] + 1;
+					}
 				}
 				//下面是对于绘制的节点的x位置进行计算
 				var backXCompute = xCompute;
@@ -974,7 +1000,6 @@ var radial = function(){
 		{
 			acc_depth_node_num[linear_tree[i]._depth]=acc_depth_node_num[linear_tree[i]._depth]+1;
 		}
-		console.log(linear_tree);
 		d3.select("#radial").selectAll(".bar-class").remove();
 		svg.selectAll('.bar-class')
 		.data(linear_tree)
@@ -1164,7 +1189,7 @@ var radial = function(){
 							});
 				}
 			}
-			draw_barcoded_tree_depth(linear_tree,4,4,d.route);
+			draw_barcoded_tree_depth(linear_tree,4,d._depth,d.route);
 		});
 		draw_link();
 	}
@@ -1242,12 +1267,13 @@ var radial = function(){
 			if((d._depth <= curDrawDep) && (d.continuous_repeat_time == 1) && (curDrawDep != 10)){
 				curDrawDep = 10;
 				if((formerNodeRepeat - 1)%rowNum != 0){
-					xCompute = xCompute + 2 * widthArray[d._depth] + 1;
+					xCompute = xCompute + widthArray[d._depth] + 1;
 				}
-			}
-			//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
-			if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
-				xCompute = xCompute + widthArray[d._depth]/3 + 1;
+			}else{
+				//手动来换行的第二种情况，上一个节点没有达到缩略的位置，下一个节点也是缩略的但是要比当前缩略的节点的level更高
+				if(formerDepth > d._depth && d.continuous_repeat_time != 1) {
+					xCompute = xCompute + widthArray[formerDepth] + 1;
+				}
 			}
 			//下面是对于绘制的节点的x位置进行计算
 			var backXCompute = xCompute;
