@@ -150,12 +150,12 @@ var radial = function(){
 	        	finalValue = finalValue < min ? min : finalValue;
 	        	widthArray[i] = finalValue;
 	        	if($("#state-change").hasClass("active")){
-					draw_reduce_barcoded_tree(linear_tree,1);
-					draw_reduce_barcoded_depth(linear_tree,shown_depth,shown_depth);
+					draw_reduced_barcoded_tree(linear_tree,1);
+					animation_reduced_barcoded_tree_depthchange_shrink(linear_tree,shown_depth,shown_depth);
 					formerDepth = shown_depth;
 				}else{
 					draw_barcoded_tree(linear_tree,1);
-					draw_barcoded_tree_depth(linear_tree,shown_depth,shown_depth);
+					animation_unreduced_barcoded_tree_depthchange_shrink(linear_tree,shown_depth,shown_depth);
 					formerDepth = shown_depth;
 				}
 	        	changePercentage(finalValue);
@@ -216,13 +216,13 @@ var radial = function(){
 
 	//根据state-change按钮的标记决定画直接的barcode还是画带横杠的barcode
 	if($("#state-change").hasClass("active")){
-		draw_reduce_barcoded_tree(linear_tree,1);
-		draw_reduce_barcoded_depth(linear_tree,shown_depth,shown_depth);
+		draw_reduced_barcoded_tree(linear_tree,1);
+		animation_reduced_barcoded_tree_depthchange_shrink(linear_tree,shown_depth,shown_depth);
 		formerDepth = shown_depth;
 	}
 	else{
 		draw_barcoded_tree(linear_tree,1);
-		draw_barcoded_tree_depth(linear_tree,shown_depth,shown_depth);
+		animation_unreduced_barcoded_tree_depthchange_shrink(linear_tree,shown_depth,shown_depth);
 		formerDepth = shown_depth;
 	}
 
@@ -231,7 +231,7 @@ var radial = function(){
 	//其中原来的深度former_depth比希望展示的深度depth大，
 	//以及当前希望收缩的那一个子树的根treeDes以后，通过动画切换控制显示的数据的转换
 	//此时需要先让深度过大的结点消失；再让其他节点移动，把因为消失而产生的空白补掉
-	function draw_barcoded_tree_depth(linear_tree,former_depth,depth,treeDes){
+	function animation_unreduced_barcoded_tree_depthchange_shrink(linear_tree,former_depth,depth,treeDes){
 		console.log("treeDes:" + treeDes);
 		//按下换depth的button时，要把原来的tip全都删光
 		for (var i=0;i<linear_tree.length;++i)
@@ -342,7 +342,7 @@ var radial = function(){
 					draw_link(); 
 				}else{
 					currentDepth = currentDepth - 1;
-					draw_barcoded_tree_depth(linear_tree,currentDepth,depth,treeDes)
+					animation_unreduced_barcoded_tree_depthchange_shrink(linear_tree,currentDepth,depth,treeDes)
 				}
 			});
 		} 
@@ -355,7 +355,7 @@ var radial = function(){
 	//其中原来的深度former_depth比希望展示的深度depth小，
 	//以及当前希望收缩的那一个子树的根treeDes以后，通过动画切换控制显示的数据的转换
 	//此时需要先让已有的结点移动，给将要显示结点的位置留出空地；再让需要显示的结点在空地出现
-	function draw_barcoded_tree_move(linear_tree,former_depth,depth){
+	function animation_unreduced_barcoded_tree_depthchange_stretch(linear_tree,former_depth,depth){
 		xCompute = 0;
 		var formerWidthArray = [];
 		former_depth = +former_depth;
@@ -421,7 +421,7 @@ var radial = function(){
 					draw_link();
 				}else{
 					currentDepth = currentDepth + 1;
-					draw_barcoded_tree_move(linear_tree,currentDepth,depth)
+					animation_unreduced_barcoded_tree_depthchange_stretch(linear_tree,currentDepth,depth)
 				}
 			});
 		}
@@ -480,7 +480,7 @@ var radial = function(){
 	//其中原来的深度former_depth比希望展示的深度depth大，
 	//以及当前希望收缩的那一个子树的根treeDes以后，通过动画切换控制显示的数据的转换
 	//此时需要先让深度过大的结点消失；再让其他节点移动，把因为消失而产生的空白补掉
-	function draw_reduce_barcoded_depth(linear_tree,former_depth,depth){
+	function animation_reduced_barcoded_tree_depthchange_shrink(linear_tree,former_depth,depth){
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
 		var barHeight = rectHeight / divideNum * 2;
@@ -714,7 +714,7 @@ var radial = function(){
 					draw_link(); 
 				}else{
 					currentDepth = currentDepth - 1;
-					draw_reduce_barcoded_depth(linear_tree,currentDepth,depth)
+					animation_reduced_barcoded_tree_depthchange_shrink(linear_tree,currentDepth,depth)
 				}
 			});
 		} 
@@ -726,7 +726,7 @@ var radial = function(){
 	//其中原来的深度former_depth比希望展示的深度depth小，
 	//以及当前希望收缩的那一个子树的根treeDes以后，通过动画切换控制显示的数据的转换
 	//此时需要先让已有的结点移动，给将要显示结点的位置留出空地；再让需要显示的结点在空地出现
-	function draw_reduce_barcoded_move(linear_tree,former_depth,depth){
+	function animation_reduced_barcoded_tree_depthchange_stretch(linear_tree,former_depth,depth){
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
 		var barHeight = rectHeight / divideNum * 2;
@@ -956,7 +956,7 @@ var radial = function(){
 					draw_link();
 				}else{
 					currentDepth = currentDepth + 1;
-					draw_reduce_barcoded_move(linear_tree,currentDepth,depth)
+					animation_reduced_barcoded_tree_depthchange_stretch(linear_tree,currentDepth,depth)
 				}
 			});
 		}
@@ -1189,7 +1189,7 @@ var radial = function(){
 							});
 				}
 			}
-			draw_barcoded_tree_depth(linear_tree,4,d._depth,d.route);
+			animation_unreduced_barcoded_tree_depthchange_shrink(linear_tree,4,d._depth,d.route);
 		});
 		draw_link();
 	}
@@ -1198,7 +1198,7 @@ var radial = function(){
 	
 	//画使用横杠的树
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
-	function draw_reduce_barcoded_tree(linear_tree,cur_tree_index)
+	function draw_reduced_barcoded_tree(linear_tree,cur_tree_index)
 	{
 		var svg = d3.select('#radial'); 
 		for (var i=0;i<tip_array.length;++i){
@@ -1554,15 +1554,15 @@ var radial = function(){
 			$("#radial-depth-controller .level-btn[level=" + i + "]").addClass("active");
 		if(formerDepth < dep){
 			if($("#state-change").hasClass("active")){
-				draw_reduce_barcoded_move(linear_tree,formerDepth,dep);
+				animation_reduced_barcoded_tree_depthchange_stretch(linear_tree,formerDepth,dep);
 			}else{
-				draw_barcoded_tree_move(linear_tree,formerDepth,dep);
+				animation_unreduced_barcoded_tree_depthchange_stretch(linear_tree,formerDepth,dep);
 			}
 		}else if(formerDepth > dep){
 			if($("#state-change").hasClass("active")){
-				draw_reduce_barcoded_depth(linear_tree,formerDepth,dep);
+				animation_reduced_barcoded_tree_depthchange_shrink(linear_tree,formerDepth,dep);
 			}else{
-				draw_barcoded_tree_depth(linear_tree,formerDepth,dep);
+				animation_unreduced_barcoded_tree_depthchange_shrink(linear_tree,formerDepth,dep);
 			}
 		}
 		formerDepth = dep;
@@ -1581,18 +1581,18 @@ var radial = function(){
 			shown_depth == 0?formerDepth=4:formerDepth=0;
 			draw_barcoded_tree(linear_tree,1);
 			if(formerDepth < shown_depth){
-				draw_barcoded_tree_move(linear_tree,formerDepth,shown_depth);
+				animation_unreduced_barcoded_tree_depthchange_stretch(linear_tree,formerDepth,shown_depth);
 			}else if(formerDepth > shown_depth){
-				draw_barcoded_tree_depth(linear_tree,formerDepth,shown_depth);
+				animation_unreduced_barcoded_tree_depthchange_shrink(linear_tree,formerDepth,shown_depth);
 			}
 			$("#state-change").removeClass("active");
 		}else{
 			shown_depth == 0?formerDepth=4:formerDepth=0;
-			draw_reduce_barcoded_tree(linear_tree,1);
+			draw_reduced_barcoded_tree(linear_tree,1);
 			if(formerDepth < shown_depth){
-				draw_reduce_barcoded_move(linear_tree,formerDepth,shown_depth);
+				animation_reduced_barcoded_tree_depthchange_stretch(linear_tree,formerDepth,shown_depth);
 			}else if(formerDepth > shown_depth){
-				draw_reduce_barcoded_depth(linear_tree,formerDepth,shown_depth);
+				animation_reduced_barcoded_tree_depthchange_shrink(linear_tree,formerDepth,shown_depth);
 			}
 			$("#state-change").addClass("active");
 		}
