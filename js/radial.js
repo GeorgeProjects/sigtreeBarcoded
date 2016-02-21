@@ -216,17 +216,26 @@ var radial = function(){
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	
+	//标记每个元素的tooltip在mouseout时是隐去还是保持
 	var maintain_tooltip_display=[];
 
+	//根据state-change按钮的标记决定画直接的barcode还是画带横杠的barcode
 	if($("#state-change").hasClass("active")){
 		draw_reduce_barcoded_tree(linear_tree,1);
 		draw_reduce_barcoded_depth(linear_tree,shown_depth,shown_depth);
 		formerDepth = shown_depth;
-	}else{
+	}
+	else{
 		draw_barcoded_tree(linear_tree,1);
 		draw_barcoded_tree_depth(linear_tree,shown_depth,shown_depth);
 		formerDepth = shown_depth;
 	}
+
+	//对于没有使用横杠的树
+	//给定树在之前展示的深度former_depth和希望当前展示的深度depth，
+	//其中原来的深度former_depth比希望展示的深度depth大，
+	//以及当前希望收缩的那一个子树的根treeDes以后，通过动画切换控制显示的数据的转换
+	//此时需要先让深度过大的结点消失；再让其他节点移动，把因为消失而产生的空白补掉
 	function draw_barcoded_tree_depth(linear_tree,former_depth,depth,treeDes){
 		//按下换depth的button时，要把原来的tip全都删光
 		for (var i=0;i<linear_tree.length;++i)
@@ -318,6 +327,12 @@ var radial = function(){
 	}
 	//-----------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------
+	
+	//对于没有使用横杠的树
+	//给定树在之前展示的深度former_depth和希望当前展示的深度depth，
+	//其中原来的深度former_depth比希望展示的深度depth小，
+	//以及当前希望收缩的那一个子树的根treeDes以后，通过动画切换控制显示的数据的转换
+	//此时需要先让已有的结点移动，给将要显示结点的位置留出空地；再让需要显示的结点在空地出现
 	function draw_barcoded_tree_move(linear_tree,former_depth,depth){
 		xCompute = 0;
 		var formerWidthArray = [];
@@ -437,7 +452,12 @@ var radial = function(){
 		}
 	}
 	var g;
-	//标记每个元素的tooltip在mouseout时是隐去还是保持
+	
+	//对于使用横杠的树
+	//给定树在之前展示的深度former_depth和希望当前展示的深度depth，
+	//其中原来的深度former_depth比希望展示的深度depth大，
+	//以及当前希望收缩的那一个子树的根treeDes以后，通过动画切换控制显示的数据的转换
+	//此时需要先让深度过大的结点消失；再让其他节点移动，把因为消失而产生的空白补掉
 	function draw_reduce_barcoded_depth(linear_tree,former_depth,depth){
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
@@ -676,6 +696,12 @@ var radial = function(){
 		} 
 	}
 	//---------------------------------------------------------------------------
+
+	//对于使用横杠的树
+	//给定树在之前展示的深度former_depth和希望当前展示的深度depth，
+	//其中原来的深度former_depth比希望展示的深度depth小，
+	//以及当前希望收缩的那一个子树的根treeDes以后，通过动画切换控制显示的数据的转换
+	//此时需要先让已有的结点移动，给将要显示结点的位置留出空地；再让需要显示的结点在空地出现
 	function draw_reduce_barcoded_move(linear_tree,former_depth,depth){
 		var rowNum = 7;
 		var divideNum = rowNum * 3 - 1;
@@ -911,6 +937,7 @@ var radial = function(){
 	}
 	//---------------------------------------------------------------------------
 
+	//画不使用横杠的树
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
 	function draw_barcoded_tree(linear_tree,cur_tree_index)
 	{
@@ -1143,6 +1170,8 @@ var radial = function(){
 	}
 	//---------------------------------------------------------------------------
 	//---------------------------------------------------------------------------
+	
+	//画使用横杠的树
 	//给定合并后的并集树linear_tree，当前要画的树的编号cur_tree_index
 	function draw_reduce_barcoded_tree(linear_tree,cur_tree_index)
 	{

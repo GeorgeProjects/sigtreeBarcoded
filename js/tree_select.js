@@ -14,10 +14,6 @@ var treeSelect = function(){
 
 	var dataList = timeSortArray_flowsize;
 
-
-
-
-
 	var sortMode = "time";
 	var datadimMode = "flowsize";
 
@@ -68,9 +64,7 @@ var treeSelect = function(){
 	var scrollWidth = $("#srocllDiv").width();
 	var topWrapperWidth = $("#topWrapper").width();
 	var widthPercentage = Math.round(scrollWidth * 2 / topWrapperWidth * 100);
-	// $("#innerTopRight").css("width", widthPercentage+"%");  
-	// $("#innerTopLeft").css("width", (100 - widthPercentage)+"%");  
-	//document.getElementById('srocllDiv').style.height = svgHeight * 2/3 + "px";
+
 	//给定sortMode和datadimMode以后，决定显示哪一个数据数组
 	function choose_displayArray(sortMode,datadimMode)
 	{
@@ -490,8 +484,11 @@ var treeSelect = function(){
 
 				compareNum = selectedID;
 
-				changeComparedData();
+				changeComparedData(compareNum);
 				d3.select("#append-rect").select("#percen-rect").remove();
+			})
+			.on("dblclick",function(d,i){
+				console.log("double!!")
 			});
 		}
 		
@@ -510,8 +507,14 @@ var treeSelect = function(){
 				}
 			}			
 		}
-		changeComparedData();
-		function changeComparedData() {
+		changeComparedData(compareNum);
+		//在histogram里面选择了id为compareNum的柱子后，会调用该changeComparedData
+		//changeComparedData中	1.	将之前被设为current的柱子取消掉，让他的颜色退回去；
+		//							让当前被选中的柱子标成current，变成蓝色
+		//						2.	将原来柱子上的label取消；在当前的柱子上加上label
+		//						3.	修改右上角显示的数据描述
+		//						4.	post换数据的信息，等main接收，main接收以后换数据，重新调用radial来重新画barcode
+		function changeComparedData(compareNum) {
 			d3.selectAll(".selected_seperate_bar")
 				.classed("selected_seperate_bar", false)//去红色
 				.classed("current", true);//加蓝色
@@ -524,55 +527,60 @@ var treeSelect = function(){
 			var id = compareNum;
 			var x = chart.selectAll("#his-" + id).attr("x");
 			var y = chart.selectAll("#his-" + id).attr("y") - 3;
-			chart.append("text")
+			
+			chart.append("text")//histogram的被选中的柱子上面的label
 				.attr("class","labelAB")
 				.attr("x", x)
 				.attr("y", y)
 				.text("A");
-			$("#innerTopRight #label-A .date_description").html(function() {
-				if (compareArray.length > 0) 
-				{
-					//console.log(compareArray);
-					//console.log(dataList);
-					var timeArray = dataList[compareArray[1]].time.split("-");
-					return timeArray[0];
-				}
-				return "";
-			});
-			$("#innerTopRight #label-A .value_description").text(function() {
-				if (compareArray.length > 0)  
-				{
-					return  d3.format(".3s")(dataList[compareArray[1]].value) + "bytes" ;
-				}
-				return "";
-			});
-			$("#innerTopRight #label-A .level_description").text(function() {
-				if (compareArray.length > 0)
-				{
-					var levelDescription = 4;
-					return  levelDescription;
-				}
-				return "";
-			});
-			$("#innerTopRight #label-A .node_num_description").text(function() {
-				if (compareArray.length > 0)
-				{
-					var nodeNumDescription = dataList[compareArray[1]].sumNode;
-					return nodeNumDescription;
-				}
-				return "";
-			});
 
-			for (var i=0;i<=4;++i)
+			update_inner_top_right_description();
+			//更新右上角的数据描述
+			function update_inner_top_right_description()
 			{
-				$("#innerTopRight #label-A .L"+i+"node_num_description").text(function() {
+				$("#innerTopRight #label-A .date_description").html(function() {
+					if (compareArray.length > 0) 
+					{
+						var timeArray = dataList[compareArray[1]].time.split("-");
+						return timeArray[0];
+					}
+					return "";
+				});
+				$("#innerTopRight #label-A .value_description").text(function() {
+					if (compareArray.length > 0)  
+					{
+						return  d3.format(".3s")(dataList[compareArray[1]].value) + "bytes" ;
+					}
+					return "";
+				});
+				$("#innerTopRight #label-A .level_description").text(function() {
 					if (compareArray.length > 0)
 					{
-						var nodeNumDescription = dataList[compareArray[1]]["L"+i+"Node"];
+						var levelDescription = 4;
+						return  levelDescription;
+					}
+					return "";
+				});
+				$("#innerTopRight #label-A .node_num_description").text(function() {
+					if (compareArray.length > 0)
+					{
+						var nodeNumDescription = dataList[compareArray[1]].sumNode;
 						return nodeNumDescription;
 					}
 					return "";
 				});
+
+				for (var i=0;i<=4;++i)
+				{
+					$("#innerTopRight #label-A .L"+i+"node_num_description").text(function() {
+						if (compareArray.length > 0)
+						{
+							var nodeNumDescription = dataList[compareArray[1]]["L"+i+"Node"];
+							return nodeNumDescription;
+						}
+						return "";
+					});
+				}
 			}
 
 			compareArray[1] = compareNum;

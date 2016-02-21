@@ -35,10 +35,12 @@ var mainController = function(){
     dataCenter.datasets = [];
     this.OMListen = function(message, data) {
         if (message == "changeData") {
-            var justChangeDataA = false;
-            if (data[1] == datasetID[1])
-                justChangeDataA = true;
-            datasetID = _.clone(data);
+            var justChangeDataA = /*false*/true;
+            console.log(data,datasetID)
+            if (data[1] == datasetID[1])//如果这次点击的数据data[1]和原来显示的数据datasetID[1]一样
+                justChangeDataA = /*true*/false;//标记没有换数据，之后不需要重新画
+
+            datasetID = _.clone(data);//把datasetID变成与data值相同的一个复制品
             var defers = [];
             for (var i = data.length - 1; i > 0; i--) {
                 var id = data[i];
@@ -54,10 +56,10 @@ var mainController = function(){
             }
             $.when(defers[0], defers[1])
                 .done(function() {
-                    if (justChangeDataA == false) {
+                    if (justChangeDataA == /*false*/true) {
                         $("svg[class=radial]").html("");
-                        $("svg[class=parset]").html("");
-                        $("#treemap").html("");
+                        //$("svg[class=parset]").html("");
+                        //$("#treemap").html("");
 
                         var listeners = _.without(ObserverManager.getListeners(), radialView, treeCompareView, parsetView); //remove old views in listeners
                         ObserverManager.setListeners(listeners);
@@ -67,7 +69,7 @@ var mainController = function(){
                         //parsetView = parset();    
                         //end of change
                     } else {
-                        $("#treemap").html(""); 
+                       // $("#treemap").html(""); 
                         var listeners = _.without(ObserverManager.getListeners(), treeCompareView); //remove old views in listeners
                        
                         //start of change
